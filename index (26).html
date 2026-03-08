@@ -5274,7 +5274,7 @@ function sendPushNotification(title, body, url) {
         icon: '/icon-192.png',
         badge: '/icon-192.png',
         tag: 'action-reminder',
-        requireInteraction: true
+        requireInteraction: true 
     });
     if (url) notif.onclick = () => { window.focus(); notif.close(); };
 }
