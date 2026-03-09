@@ -3,16 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australian Business Development & CRM System</title>
+    <title id="pageTitle">Australian Business Development & CRM System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+    <link id="brandFontLink" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 
     <!-- Firebase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ██████╗ ██████╗  █████╗ ███╗   ██╗██████╗      ██████╗ ██████╗ ███╗  ██╗███████╗██╗ ██████╗
+         ██╔══██╗██╔══██╗██╔══██╗████╗  ██║██╔══██╗    ██╔════╝██╔═══██╗████╗ ██║██╔════╝██║██╔════╝
+         ██████╔╝██████╔╝███████║██╔██╗ ██║██║  ██║    ██║     ██║   ██║██╔██╗██║█████╗  ██║██║  ███╗
+         ██╔══██╗██╔══██╗██╔══██║██║╚██╗██║██║  ██║    ██║     ██║   ██║██║╚████║██╔══╝  ██║██║   ██║
+         ██████╔╝██║  ██║██║  ██║██║ ╚████║██████╔╝    ╚██████╗╚██████╔╝██║ ╚███║██║     ██║╚██████╔╝
+         ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝      ╚═════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝     ╚═╝ ╚═════╝
+
+         WHITE-LABEL CONFIG — This is the ONLY block you need to change per client.
+         Copy this file, swap the BRAND object below, done. Everything flows from here.
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <script>
+    const BRAND = {
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  IDENTITY                                                        │
+        // └─────────────────────────────────────────────────────────────────┘
+        companyName:   'Australian BD & CRM',          // Full name — auth screen heading & exports
+        companyShort:  'AUS BD',                        // Abbreviated — used in emails, page title
+        tagline:       'Business Development & CRM',    // Sub-line under company name on login screen
+        logoText:      'BD',                            // 2–3 char initials (shown if no logoUrl)
+        logoUrl:       '',                              // URL to your logo image — leave '' to use text/icon
+        faviconUrl:    '',                              // URL to favicon — leave '' for browser default
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  COLOURS  (use https://colorhex.net to find hex codes)          │
+        // └─────────────────────────────────────────────────────────────────┘
+        primaryColor:  '#771414',   // Main brand colour — buttons, active states, borders
+        primaryLight:  '#a31a1a',   // Hover / lighter variant
+        primaryDark:   '#550e0e',   // Pressed / darker variant
+        accentColor:   '#FFCD00',   // Gradient end & secondary highlight
+        primaryText:   '#ffffff',   // Text colour ON primary backgrounds (usually white)
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  TYPOGRAPHY  (must match the Google Font loaded above)          │
+        // └─────────────────────────────────────────────────────────────────┘
+        headingFont:   'Syne',      // h1/h2/h3 — change to any Google Font name
+        bodyFont:      'DM Sans',   // Body text
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  FIREBASE  — each client gets their own Firebase project        │
+        // └─────────────────────────────────────────────────────────────────┘
+        firebase: {
+            apiKey:            'AIzaSyACeeQF5c4sKwQxM4LaW4pzlPd7R5HuRSg',
+            authDomain:        'queensland-business-reporting.firebaseapp.com',
+            projectId:         'queensland-business-reporting',
+            storageBucket:     'queensland-business-reporting.firebasestorage.app',
+            messagingSenderId: '271437640355',
+            appId:             '1:271437640355:web:d11f19e2b61c30d5bd8516',
+        },
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  APP BEHAVIOUR                                                   │
+        // └─────────────────────────────────────────────────────────────────┘
+        appTitle:      'Australian Business Development & CRM',
+        defaultState:  'QLD',       // Which Australian state to open on login
+        showPoweredBy: true,        // Show 'Powered by BD Suite' watermark in footer
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  FEATURE FLAGS  — set false to hide that feature entirely        │
+        // └─────────────────────────────────────────────────────────────────┘
+        features: {
+            tenders:         true,   // Tenders & Opportunities tab
+            crm:             true,   // CRM & Contacts tab
+            analytics:       true,   // Analytics & Pipeline tab
+            feedback:        true,   // Customer Feedback tab
+            myActions:       true,   // My Actions tab
+            exportWord:      true,   // Word export buttons
+            exportExcel:     true,   // Excel/CSV export buttons
+            bulkSelect:      true,   // Bulk status update mode
+            kanbanView:      true,   // Kanban board view toggle
+            darkMode:        true,   // Dark mode toggle button
+            linkedContacts:  true,   // Link CRM contacts to tenders
+            sharePoint:      true,   // SharePoint URL field on tenders
+        },
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │  TERMINOLOGY  — rename things to match your client's language   │
+        // └─────────────────────────────────────────────────────────────────┘
+        terms: {
+            tender:   'Tender',      // e.g. 'Project', 'Opportunity', 'Bid', 'Contract'
+            tenders:  'Tenders',
+            region:   'Region',      // e.g. 'Territory', 'District', 'Area'
+            regions:  'Regions',
+            council:  'Council',     // e.g. 'Client', 'Local Government', 'Organisation'
+        },
+    };
+
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  EXAMPLE CLIENT CONFIGS — uncomment and paste over the BRAND block above
+    // ════════════════════════════════════════════════════════════════════════
+    /*
+
+    // ── Client 2: Infrastructure firm — navy & gold ──────────────────────
+    const BRAND = {
+        companyName:   'InfraTrack Pro',
+        companyShort:  'InfraTrack',
+        tagline:       'Tender & Contract Management',
+        logoText:      'IT',
+        logoUrl:       '',
+        faviconUrl:    '',
+        primaryColor:  '#0f4c81',
+        primaryLight:  '#1a6db5',
+        primaryDark:   '#0a3457',
+        accentColor:   '#f0a500',
+        primaryText:   '#ffffff',
+        headingFont:   'Syne',
+        bodyFont:      'DM Sans',
+        firebase: {
+            apiKey:        'YOUR_INFRATRACK_API_KEY',
+            authDomain:    'infratrack-pro.firebaseapp.com',
+            projectId:     'infratrack-pro',
+            storageBucket: 'infratrack-pro.appspot.com',
+            messagingSenderId: '000000000',
+            appId:         '1:000000000:web:abc123',
+        },
+        appTitle:      'InfraTrack Pro',
+        defaultState:  'NSW',
+        showPoweredBy: true,
+        features: {
+            tenders: true, crm: true, analytics: true, feedback: true,
+            myActions: true, exportWord: true, exportExcel: true,
+            bulkSelect: true, kanbanView: true, darkMode: true,
+            linkedContacts: true, sharePoint: false,
+        },
+        terms: {
+            tender: 'Project', tenders: 'Projects',
+            region: 'District', regions: 'Districts', council: 'Client',
+        },
+    };
+
+    // ── Client 3: Civil construction — forest green ──────────────────────
+    const BRAND = {
+        companyName:   'CivEx Business Hub',
+        companyShort:  'CivEx',
+        tagline:       'Civil Construction CRM',
+        logoText:      'CX',
+        logoUrl:       '',
+        faviconUrl:    '',
+        primaryColor:  '#1a6b3c',
+        primaryLight:  '#2a8f52',
+        primaryDark:   '#0f4526',
+        accentColor:   '#f5c518',
+        primaryText:   '#ffffff',
+        headingFont:   'Syne',
+        bodyFont:      'DM Sans',
+        firebase: {
+            apiKey:        'YOUR_CIVEX_API_KEY',
+            authDomain:    'civex-hub.firebaseapp.com',
+            projectId:     'civex-hub',
+            storageBucket: 'civex-hub.appspot.com',
+            messagingSenderId: '000000000',
+            appId:         '1:000000000:web:abc456',
+        },
+        appTitle:      'CivEx Business Hub',
+        defaultState:  'VIC',
+        showPoweredBy: true,
+        features: {
+            tenders: true, crm: true, analytics: true, feedback: false,
+            myActions: true, exportWord: true, exportExcel: true,
+            bulkSelect: true, kanbanView: false, darkMode: true,
+            linkedContacts: true, sharePoint: true,
+        },
+        terms: {
+            tender: 'Bid', tenders: 'Bids',
+            region: 'Area', regions: 'Areas', council: 'Local Authority',
+        },
+    };
+
+    */
+
+    // ── Apply CSS variables immediately (before DOM loads) ────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        const r = document.documentElement.style;
+        r.setProperty('--accent',      BRAND.primaryColor);
+        r.setProperty('--accent-2',    BRAND.accentColor);
+        r.setProperty('--gradient-from', BRAND.primaryColor);
+        r.setProperty('--gradient-to',   BRAND.accentColor);
+        if (BRAND.faviconUrl) {
+            const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+            link.rel = 'icon'; link.href = BRAND.faviconUrl;
+            document.head.appendChild(link);
+        }
+    });
+    </script>
 
     <style>
         :root {
@@ -34,7 +221,9 @@
             --text-secondary: #6b6660;
             --text-muted: #9c9790;
             --accent: #771414;
-            --accent-2: #c0392b;
+            --accent-light: #a31a1a;
+            --accent-dark: #550e0e;
+            --accent-2: #FFCD00;
             --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
             --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
@@ -181,7 +370,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 3px;
-            background: linear-gradient(90deg, var(--qld-maroon), var(--qld-gold));
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
         }
         .stat-card:hover {
             border-color: var(--accent);
@@ -199,16 +388,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* ── DEMO BADGE ── */
-        .demo-badge {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-        }
+        
 
         /* ── MAIN TABS ── */
         .main-tab {
@@ -286,7 +466,7 @@
         .category-competitor { background: #fee2e2; color: #991b1b; }
 
         /* ── ZONE FILTERS ── */
-        .zone-filter[data-zone="SEQ"].active { background-color: #771414 !important; color: white !important; }
+        .zone-filter[data-zone="SEQ"].active { background-color: var(--accent) !important; color: var(--primary-text, white) !important; }
         .zone-filter[data-zone="NQ"].active { background-color: #0369a1 !important; color: white !important; }
         .zone-filter[data-zone="CQ"].active { background-color: #059669 !important; color: white !important; }
         .zone-filter[data-zone="SWQ"].active { background-color: #d97706 !important; color: white !important; }
@@ -433,7 +613,7 @@
             padding: 14px 24px;
             display: flex; align-items: center; gap: 16px;
             z-index: 45;
-            box-shadow: 0 -4px 24px rgba(119,20,20,0.3);
+            box-shadow: 0 -4px 24px color-mix(in srgb, var(--accent) 40%, transparent);
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
         }
@@ -459,9 +639,9 @@
         .nav-pill:hover { background: var(--surface); border-color: var(--border); }
         .nav-pill.active {
             background: var(--accent);
-            color: white;
+            color: var(--primary-text, #ffffff);
             border-color: var(--accent);
-            box-shadow: 0 2px 8px rgba(119,20,20,0.3);
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 40%, transparent);
         }
 
         /* ── QUICK STATS BAR ── */
@@ -554,6 +734,27 @@
             color: var(--text-secondary);
             font-family: monospace;
         }
+        /* ── ADMIN TABS ── */
+        .admin-tab-btn { margin-bottom: -1px; }
+        .admin-tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent) !important;
+            font-weight: 600;
+        }
+        .admin-tab-content { display: none; }
+        .admin-tab-content:not(.hidden) { display: block; }
+
+        /* ── FEATURE TOGGLE ── */
+        .feature-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--surface); border-radius: 10px; border: 1.5px solid var(--border); }
+        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #d1d5db; border-radius: 22px; transition: .25s; }
+        .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .25s; }
+        input:checked + .toggle-slider { background: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(18px); }
+
+        /* ── CUSTOM FIELD ROW ── */
+        .custom-field-row { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; }
     </style>
 <base target="_blank">
 </head>
@@ -568,11 +769,11 @@
     <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">
-                    <i class="fas fa-building"></i>
+                <div id="loginLogo" class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg text-white text-2xl font-bold display-font" style="background: var(--accent)">
+                    BD
                 </div>
-                <h2 class="text-2xl font-bold display-font">Australian Business Development & CRM</h2>
-                <p class="text-gray-500 mt-2">All States & Territories</p>
+                <h2 class="text-2xl font-bold display-font" id="authTitle" style="color: var(--accent)">Australian Business Development & CRM</h2>
+                <p class="text-gray-500 mt-2" id="authTagline">All States & Territories</p>
             </div>
 
             <div id="authForm">
@@ -596,7 +797,7 @@
                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-600 focus:outline-none">
                 </div>
 
-                <button type="button" onclick="signIn()" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors mb-3">
+                <button type="button" onclick="signIn()" class="w-full py-3 text-white rounded-lg font-medium hover:opacity-90 transition-colors mb-3" style="background: var(--accent)">
                     Sign In
                 </button>
 
@@ -608,14 +809,6 @@
                         <span class="px-2 bg-white text-gray-500">or</span>
                     </div>
                 </div>
-
-                <button onclick="enterDemoMode()" class="w-full py-3 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-900 transition-colors flex items-center justify-center">
-                    <i class="fas fa-play-circle mr-2"></i> Continue in Demo Mode
-                </button>
-
-                <p class="text-xs text-center text-gray-400 mt-4">
-                    Demo mode stores data locally on your device. No account required.
-                </p>
 
                 <div class="mt-4 pt-4 border-t border-gray-100 text-center">
                     <p class="text-xs text-gray-500">Don't have an account?</p>
@@ -685,17 +878,24 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center space-x-4">
+                        <!-- Brand mark -->
+                        <div id="navBrandMark" class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0"
+                             style="background: linear-gradient(135deg, #771414, #c0392b)">
+                            <i class="fas fa-building text-white text-sm"></i>
+                        </div>
+
                         <!-- State Switcher Dropdown -->
                         <div class="state-dropdown">
                             <button id="currentStateButton" class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-100 transition-colors">
-                                <div id="currentStateFlag" class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                <div id="currentStateFlag" class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md" style="background: var(--accent)">
                                     QLD
                                 </div>
                                 <div class="text-left">
                                     <h1 class="text-base font-bold text-gray-900 display-font tracking-tight" id="currentStateName">Queensland</h1>
                                     <div class="flex items-center text-xs text-gray-500">
+                                        <span id="brandTagline" class="font-medium" style="color: var(--accent)"></span>
+                                        <span class="mx-1 text-gray-300">·</span>
                                         <span id="userEmail"></span>
-                                        <span id="demoBadge" class="hidden demo-badge ml-2">DEMO</span>
                                     </div>
                                 </div>
                                 <i class="fas fa-chevron-down text-gray-400 ml-1 text-xs"></i>
@@ -822,7 +1022,7 @@
                                 </button>
                             </div>
                         </div>
-                        <button onclick="showAddTenderModal(null)" id="addTenderBtn" class="flex items-center px-5 py-2.5 text-white rounded-xl font-medium shadow-sm hover:opacity-90 transition-all" style="background-color: #771414;">
+                        <button onclick="showAddTenderModal(null)" id="addTenderBtn" class="flex items-center px-5 py-2.5 text-white rounded-xl font-medium shadow-sm hover:opacity-90 transition-all" id="addTenderBtn" style="background-color: var(--accent)">
                             <i class="fas fa-plus mr-2"></i> Add Tender
                         </button>
                     </div>
@@ -1850,53 +2050,399 @@
         </div>
 
         <!-- Admin Panel Modal -->
-        <div id="adminPanel" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-                <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
-                    <h3 class="text-xl font-bold display-font flex items-center">
-                        <i class="fas fa-shield-alt mr-2 text-gray-800"></i> Admin Panel
+        <div id="adminPanel" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl">
+
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 border-b flex-shrink-0">
+                    <h3 class="text-xl font-bold display-font flex items-center gap-2">
+                        <span class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm" style="background: var(--accent)">
+                            <i class="fas fa-shield-alt"></i>
+                        </span>
+                        Super Admin Console
                     </h3>
-                    <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <i class="fas fa-times text-xl"></i>
+                    <button onclick="closeAdminPanel()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-                <div class="p-6 space-y-8">
-                    <!-- Approved Users -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-1 flex items-center"><i class="fas fa-users mr-2 text-blue-500"></i> Approved Users</h4>
-                        <p class="text-sm text-gray-500 mb-3">Manage who can access the system</p>
-                        <div id="approvedUsersList" class="space-y-2">
-                            <div class="text-center py-4 text-gray-400"><p>Loading users...</p></div>
+                <!-- Admin Tabs -->
+                <div class="flex gap-1 px-6 pt-3 pb-0 border-b flex-shrink-0 overflow-x-auto">
+                    <button onclick="switchAdminTab('users')" id="adminTab-users"
+                        class="admin-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent whitespace-nowrap transition-all">
+                        <i class="fas fa-users mr-1.5"></i> Users & Access
+                    </button>
+                    <button onclick="switchAdminTab('branding')" id="adminTab-branding"
+                        class="admin-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent whitespace-nowrap transition-all">
+                        <i class="fas fa-palette mr-1.5"></i> Branding & Theme
+                    </button>
+                    <button onclick="switchAdminTab('features')" id="adminTab-features"
+                        class="admin-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent whitespace-nowrap transition-all">
+                        <i class="fas fa-toggle-on mr-1.5"></i> Features & Terms
+                    </button>
+                    <button onclick="switchAdminTab('customfields')" id="adminTab-customfields"
+                        class="admin-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent whitespace-nowrap transition-all">
+                        <i class="fas fa-sliders-h mr-1.5"></i> Custom Fields
+                    </button>
+                    <button onclick="switchAdminTab('config')" id="adminTab-config"
+                        class="admin-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent whitespace-nowrap transition-all">
+                        <i class="fas fa-code mr-1.5"></i> JSON Config
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="flex-1 overflow-y-auto">
+
+                    <!-- ── USERS & ACCESS ── -->
+                    <div id="adminContent-users" class="admin-tab-content p-6 space-y-7">
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1 flex items-center"><i class="fas fa-users mr-2 text-blue-500"></i> Approved Users</h4>
+                            <p class="text-sm text-gray-500 mb-3">Manage who can access the system</p>
+                            <div id="approvedUsersList" class="space-y-2">
+                                <div class="text-center py-4 text-gray-400">Loading users...</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1 flex items-center">
+                                <i class="fas fa-user-clock mr-2 text-amber-500"></i> Pending Access Requests
+                                <span id="pendingRequestsBadge" class="ml-2 hidden px-2 py-0.5 text-xs bg-amber-100 text-amber-800 rounded-full font-semibold"></span>
+                            </h4>
+                            <p class="text-sm text-gray-500 mb-3">Users who have requested access</p>
+                            <div id="pendingRequestsList" class="space-y-2">
+                                <div class="text-center py-4 text-gray-400">Loading requests...</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1 flex items-center"><i class="fas fa-lock mr-2 text-red-500"></i> Tab Access Control</h4>
+                            <p class="text-sm text-gray-500 mb-3">Check tabs to restrict (hide) them from specific users. Admins always have full access.</p>
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-xs text-amber-800">
+                                <i class="fas fa-info-circle mr-1"></i> Leave a user with no restrictions to grant full access.
+                            </div>
+                            <div id="tabPermissionsList" class="space-y-3">
+                                <div class="text-center py-4 text-gray-400">Loading...</div>
+                            </div>
+                            <button onclick="loadTabPermissions()" class="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-sync mr-1"></i> Refresh
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Pending Access Requests -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-1 flex items-center">
-                            <i class="fas fa-user-clock mr-2 text-amber-500"></i> Pending Access Requests
-                            <span id="pendingRequestsBadge" class="ml-2 hidden px-2 py-0.5 text-xs bg-amber-100 text-amber-800 rounded-full font-semibold"></span>
-                        </h4>
-                        <p class="text-sm text-gray-500 mb-3">Users who have requested access to the system</p>
-                        <div id="pendingRequestsList" class="space-y-2">
-                            <div class="text-center py-4 text-gray-400"><p>Loading requests...</p></div>
+                    <!-- ── BRANDING & THEME ── -->
+                    <div id="adminContent-branding" class="admin-tab-content hidden p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                            <!-- Left: form -->
+                            <div class="space-y-5">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-building text-blue-600 text-sm"></i></span>
+                                        Company Identity
+                                    </h4>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Company Name <span class="text-gray-400 font-normal">(full)</span></label>
+                                            <input id="bc_companyName" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-gray-600 mb-1">Short Name</label>
+                                                <input id="bc_companyShort" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-gray-600 mb-1">Logo Initials</label>
+                                                <input id="bc_logoText" type="text" maxlength="3" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Tagline</label>
+                                            <input id="bc_tagline" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Logo URL <span class="text-gray-400 font-normal">(leave blank to use initials)</span></label>
+                                            <input id="bc_logoUrl" type="url" placeholder="https://…" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Favicon URL <span class="text-gray-400 font-normal">(optional)</span></label>
+                                            <input id="bc_faviconUrl" type="url" placeholder="https://…" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                        <span class="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-palette text-purple-600 text-sm"></i></span>
+                                        Colour Scheme
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Primary Colour</label>
+                                            <div class="flex items-center gap-2">
+                                                <input id="bc_primaryColor" type="color" class="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" oninput="livePreviewBrand()">
+                                                <input id="bc_primaryColorHex" type="text" maxlength="7" placeholder="#771414" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-400" oninput="syncColorFromHex('primary')">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Accent Colour</label>
+                                            <div class="flex items-center gap-2">
+                                                <input id="bc_accentColor" type="color" class="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" oninput="livePreviewBrand()">
+                                                <input id="bc_accentColorHex" type="text" maxlength="7" placeholder="#FFCD00" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-400" oninput="syncColorFromHex('accent')">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Primary Light</label>
+                                            <div class="flex items-center gap-2">
+                                                <input id="bc_primaryLight" type="color" class="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" oninput="livePreviewBrand()">
+                                                <input id="bc_primaryLightHex" type="text" maxlength="7" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-400" oninput="syncColorFromHex('primaryLight')">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Text on Primary</label>
+                                            <div class="flex items-center gap-2">
+                                                <input id="bc_primaryText" type="color" class="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" oninput="livePreviewBrand()">
+                                                <input id="bc_primaryTextHex" type="text" maxlength="7" placeholder="#ffffff" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono focus:outline-none focus:border-blue-400" oninput="syncColorFromHex('primaryText')">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick palette presets -->
+                                    <div class="mt-3">
+                                        <label class="block text-xs font-semibold text-gray-600 mb-2">Quick Palettes</label>
+                                        <div class="flex flex-wrap gap-2">
+                                            <button onclick="applyPalette('#771414','#FFCD00','#a31a1a','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#771414">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#771414"></span> Default Red
+                                            </button>
+                                            <button onclick="applyPalette('#0f4c81','#f0a500','#1a6db5','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#0f4c81">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#0f4c81"></span> Navy Blue
+                                            </button>
+                                            <button onclick="applyPalette('#1a6b3c','#f5c518','#2a8f52','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#1a6b3c">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#1a6b3c"></span> Forest Green
+                                            </button>
+                                            <button onclick="applyPalette('#1e3a5f','#e8a020','#2952a3','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#1e3a5f">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#1e3a5f"></span> Midnight
+                                            </button>
+                                            <button onclick="applyPalette('#7b2d8b','#f0c040','#9b3dab','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#7b2d8b">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#7b2d8b"></span> Purple
+                                            </button>
+                                            <button onclick="applyPalette('#c0392b','#f39c12','#e74c3c','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#c0392b">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#c0392b"></span> Crimson
+                                            </button>
+                                            <button onclick="applyPalette('#2c3e50','#e67e22','#3d5166','#ffffff')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium hover:shadow-sm transition-all" style="border-color:#2c3e50">
+                                                <span class="w-3 h-3 rounded-full inline-block" style="background:#2c3e50"></span> Slate
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                        <span class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-font text-green-600 text-sm"></i></span>
+                                        Typography
+                                    </h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Heading Font</label>
+                                            <select id="bc_headingFont" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" onchange="livePreviewBrand()">
+                                                <option value="Syne">Syne (default)</option>
+                                                <option value="Playfair Display">Playfair Display</option>
+                                                <option value="Montserrat">Montserrat</option>
+                                                <option value="Raleway">Raleway</option>
+                                                <option value="Oswald">Oswald</option>
+                                                <option value="Nunito">Nunito</option>
+                                                <option value="Poppins">Poppins</option>
+                                                <option value="Roboto Slab">Roboto Slab</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Body Font</label>
+                                            <select id="bc_bodyFont" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" onchange="livePreviewBrand()">
+                                                <option value="DM Sans">DM Sans (default)</option>
+                                                <option value="Inter">Inter</option>
+                                                <option value="Source Sans 3">Source Sans 3</option>
+                                                <option value="Lato">Lato</option>
+                                                <option value="Nunito">Nunito</option>
+                                                <option value="Open Sans">Open Sans</option>
+                                                <option value="Roboto">Roboto</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: live preview -->
+                            <div class="sticky top-0">
+                                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                    <span class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-eye text-amber-600 text-sm"></i></span>
+                                    Live Preview
+                                </h4>
+                                <div id="brandPreviewBox" class="rounded-xl border-2 border-gray-100 overflow-hidden shadow-sm bg-gray-50">
+                                    <!-- Mini nav bar -->
+                                    <div id="prev_nav" class="flex items-center gap-2 px-4 py-2.5" style="background:#771414">
+                                        <div id="prev_logo" class="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-extrabold bg-white bg-opacity-20">BD</div>
+                                        <div class="text-white font-bold text-sm" id="prev_name">AUS BD</div>
+                                        <div class="ml-auto flex gap-1">
+                                            <div class="w-5 h-5 rounded bg-white bg-opacity-20"></div>
+                                            <div class="w-5 h-5 rounded bg-white bg-opacity-20"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Mini content -->
+                                    <div class="p-4">
+                                        <div id="prev_heading" class="font-extrabold text-base mb-1" style="font-family:'Syne',sans-serif">Tenders & Opportunities</div>
+                                        <div id="prev_tagline" class="text-xs text-gray-500 mb-3" style="font-family:'DM Sans',sans-serif">Business Development & CRM</div>
+                                        <!-- Mini stat cards -->
+                                        <div class="grid grid-cols-3 gap-2 mb-3">
+                                            <div class="rounded-lg p-2 bg-white border border-gray-200 text-center shadow-sm">
+                                                <div class="text-lg font-extrabold" id="prev_statNum" style="font-family:'Syne',sans-serif; color:#771414">12</div>
+                                                <div class="text-xs text-gray-500">Potential</div>
+                                            </div>
+                                            <div class="rounded-lg p-2 bg-white border border-gray-200 text-center shadow-sm">
+                                                <div class="text-lg font-extrabold" style="font-family:'Syne',sans-serif; color:#771414">8</div>
+                                                <div class="text-xs text-gray-500">To Price</div>
+                                            </div>
+                                            <div class="rounded-lg p-2 bg-white border border-gray-200 text-center shadow-sm">
+                                                <div class="text-lg font-extrabold" style="font-family:'Syne',sans-serif; color:#771414">5</div>
+                                                <div class="text-xs text-gray-500">Awarded</div>
+                                            </div>
+                                        </div>
+                                        <!-- Mini button -->
+                                        <button id="prev_btn" class="w-full py-2 rounded-lg text-white text-xs font-bold" style="background:#771414">+ Add Tender</button>
+                                        <!-- Mini tab pills -->
+                                        <div class="flex gap-1 mt-3">
+                                            <span id="prev_pill" class="px-3 py-1 rounded-full text-white text-xs font-bold" style="background:#771414">Tenders</span>
+                                            <span class="px-3 py-1 rounded-full text-gray-600 text-xs font-medium bg-gray-100">CRM</span>
+                                            <span class="px-3 py-1 rounded-full text-gray-600 text-xs font-medium bg-gray-100">Analytics</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Save button -->
+                                <div class="mt-4 flex gap-2">
+                                    <button onclick="saveBrandConfig()" class="flex-1 py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-2" style="background: var(--accent)">
+                                        <i class="fas fa-save"></i> Save & Apply Branding
+                                    </button>
+                                    <button onclick="resetBrandToDefault()" class="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 transition-all">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2 text-center">Changes are saved to your database and applied instantly. The static BRAND config at the top of the file remains as a fallback.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Tab Access Permissions -->
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-1 flex items-center"><i class="fas fa-lock mr-2 text-red-500"></i> Tab Access Control</h4>
-                        <p class="text-sm text-gray-500 mb-3">Restrict which tabs users can see. QA is always accessible to everyone. Admins always have full access.</p>
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-xs text-amber-800">
-                            <i class="fas fa-info-circle mr-1"></i> Leave a user with no restrictions to grant full access. Check tabs to <strong>restrict</strong> (hide) them from that user.
+                    <!-- ── FEATURES & TERMS ── -->
+                    <div id="adminContent-features" class="admin-tab-content hidden p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                    <span class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-toggle-on text-green-600 text-sm"></i></span>
+                                    Feature Flags
+                                </h4>
+                                <div class="space-y-2" id="featureFlagsList">
+                                    <!-- populated by JS -->
+                                </div>
+                                <button onclick="saveFeatureFlags()" class="mt-4 w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background: var(--accent)">
+                                    <i class="fas fa-save"></i> Save Feature Flags
+                                </button>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                    <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-language text-blue-600 text-sm"></i></span>
+                                    Custom Terminology
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Rename labels to match your client's language. E.g. "Tender" → "Project" or "Region" → "District".</p>
+                                <div class="space-y-3" id="terminologyList">
+                                    <!-- populated by JS -->
+                                </div>
+                                <button onclick="saveTerminology()" class="mt-4 w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background: var(--accent)">
+                                    <i class="fas fa-save"></i> Save Terminology
+                                </button>
+                            </div>
                         </div>
-                        <div id="tabPermissionsList" class="space-y-3">
-                            <div class="text-center py-4 text-gray-400"><p>Loading...</p></div>
-                        </div>
-                        <button onclick="loadTabPermissions()" class="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
-                            <i class="fas fa-sync mr-1"></i> Refresh Permissions
-                        </button>
                     </div>
+
+                    <!-- ── CUSTOM FIELDS ── -->
+                    <div id="adminContent-customfields" class="admin-tab-content hidden p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Tender custom fields -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-bold text-gray-900 flex items-center gap-2">
+                                        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-contract text-blue-600 text-sm"></i></span>
+                                        Tender Extra Fields
+                                    </h4>
+                                    <button onclick="addCustomField('tender')" class="px-3 py-1.5 text-xs font-bold text-white rounded-lg hover:opacity-90" style="background:var(--accent)">
+                                        <i class="fas fa-plus mr-1"></i> Add Field
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-3">Add company-specific fields to every tender. They appear in the tender modal and optionally on cards.</p>
+                                <div id="customTenderFieldsList" class="space-y-2"></div>
+                            </div>
+                            <!-- CRM custom fields -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-bold text-gray-900 flex items-center gap-2">
+                                        <span class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-user text-green-600 text-sm"></i></span>
+                                        CRM Contact Extra Fields
+                                    </h4>
+                                    <button onclick="addCustomField('crm')" class="px-3 py-1.5 text-xs font-bold text-white rounded-lg hover:opacity-90" style="background:var(--accent)">
+                                        <i class="fas fa-plus mr-1"></i> Add Field
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-3">Add company-specific fields to every CRM contact.</p>
+                                <div id="customCRMFieldsList" class="space-y-2"></div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="saveCustomFields()" class="px-6 py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2" style="background: var(--accent)">
+                                <i class="fas fa-save"></i> Save Custom Fields
+                            </button>
+                        </div>
+                        <div class="mt-4 bg-blue-50 rounded-xl p-4 text-xs text-blue-800 border border-blue-100">
+                            <strong><i class="fas fa-info-circle mr-1"></i> How custom fields work:</strong> Fields you add here appear in the tender/CRM modal for data entry. Values are stored with each record and can be viewed on the card. Use "Show on Card" to surface the most important field at a glance. Supported types: Text, Number, Date, URL, Select (dropdown).
+                        </div>
+                    </div>
+
+                    <!-- ── JSON CONFIG ── -->
+                    <div id="adminContent-config" class="admin-tab-content hidden p-6">
+                        <div class="space-y-4">
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                                <strong><i class="fas fa-info-circle mr-1"></i> How to deploy for a new client:</strong>
+                                <ol class="mt-2 ml-4 space-y-1 list-decimal text-xs">
+                                    <li>Create a new Firebase project for the client</li>
+                                    <li>Copy the HTML file, paste the Firebase config into the BRAND block at line ~29</li>
+                                    <li>Change company name, colours & features in that BRAND block</li>
+                                    <li>Log in as admin and use this panel to fine-tune — changes save to <em>that client's</em> Firestore</li>
+                                    <li>Use "Export Current Config" below to snapshot the live config as JSON</li>
+                                </ol>
+                            </div>
+
+                            <div class="flex gap-3 flex-wrap">
+                                <button onclick="exportConfigJSON()" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-medium hover:bg-gray-900 transition-all flex items-center gap-2">
+                                    <i class="fas fa-download"></i> Export Current Config
+                                </button>
+                                <button onclick="document.getElementById('importConfigInput').click()" class="px-4 py-2 bg-white border-2 border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-all flex items-center gap-2">
+                                    <i class="fas fa-upload"></i> Import Config JSON
+                                </button>
+                                <input type="file" id="importConfigInput" accept=".json" class="hidden" onchange="importConfigJSON(this)">
+                                <button onclick="copyConfigToClipboard()" class="px-4 py-2 bg-white border-2 border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-all flex items-center gap-2">
+                                    <i class="fas fa-copy"></i> Copy as BRAND block
+                                </button>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-2">Live Config JSON <span class="text-gray-400 font-normal">(editable — paste and click Apply)</span></label>
+                                <textarea id="configJsonEditor" rows="20" class="w-full font-mono text-xs bg-gray-900 text-green-400 rounded-xl p-4 border-0 focus:outline-none resize-none leading-relaxed" spellcheck="false"></textarea>
+                                <div class="flex gap-2 mt-2">
+                                    <button onclick="applyConfigFromEditor()" class="px-4 py-2 rounded-xl text-white text-sm font-bold hover:opacity-90" style="background:var(--accent)">
+                                        <i class="fas fa-play mr-1"></i> Apply JSON Config
+                                    </button>
+                                    <button onclick="refreshConfigEditor()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200">
+                                        <i class="fas fa-sync mr-1"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -1916,10 +2462,10 @@
 <script>
 // ==================== GLOBAL VARIABLES ====================
 let currentUser = null;
-let isDemoMode = false;
+const isDemoMode = false; // demo mode removed
 let currentRegion = null;
 let currentMainTab = 'tenders';
-let currentState = 'QLD';
+let currentState = BRAND.defaultState || 'QLD';
 let database = {
     tenders: [],
     crmContacts: [],
@@ -1928,16 +2474,108 @@ let database = {
     qaItems: []
 };
 
-// Firebase Config
-const firebaseConfig = {
-    apiKey: "AIzaSyACeeQF5c4sKwQxM4LaW4pzlPd7R5HuRSg",
-    authDomain: "queensland-business-reporting.firebaseapp.com",
-    projectId: "queensland-business-reporting",
-    storageBucket: "queensland-business-reporting.firebasestorage.app",
-    messagingSenderId: "271437640355",
-    appId: "1:271437640355:web:d11f19e2b61c30d5bd8516",
-    measurementId: "G-XE0LCMYLC5"
-};
+// ==================== BRAND THEMING ====================
+
+function applyBrand() {
+    const b = window.BRAND || {};
+    const primary   = b.primaryColor  || '#771414';
+    const light     = b.primaryLight  || '#a31a1a';
+    const dark      = b.primaryDark   || '#550e0e';
+    const accent2   = b.accentColor   || '#FFCD00';
+    const textOnPrimary = b.primaryText || '#ffffff';
+    const heading   = b.headingFont   || 'Syne';
+    const body      = b.bodyFont      || 'DM Sans';
+
+    // Inject CSS variables
+    const root = document.documentElement;
+    root.style.setProperty('--accent',       primary);
+    root.style.setProperty('--accent-light', light);
+    root.style.setProperty('--accent-dark',  dark);
+    root.style.setProperty('--accent-2',     accent2);
+    root.style.setProperty('--primary-text', textOnPrimary);
+    root.style.setProperty('--heading-font', `'${heading}', sans-serif`);
+    root.style.setProperty('--body-font',    `'${body}', sans-serif`);
+
+    // Apply fonts to CSS rules via style tag
+    let styleTag = document.getElementById('brandStyleOverride');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'brandStyleOverride';
+        document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = `
+        body { font-family: var(--body-font) !important; }
+        h1,h2,h3,h4,.display-font { font-family: var(--heading-font) !important; }
+        .main-tab.active { color: var(--accent) !important; }
+        .main-tab.active::after { background: var(--accent) !important; }
+        .region-card { border-left-color: var(--accent) !important; }
+        [style*="background-color: #771414"] { background-color: var(--accent) !important; }
+        .state-card.qld { border-top-color: var(--accent) !important; }
+    `;
+
+    // Page title
+    if (b.appTitle) document.title = b.appTitle;
+
+    // Favicon
+    if (b.faviconUrl) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+        link.href = b.faviconUrl;
+    }
+
+    // Wait for DOM then apply text content
+    const applyText = () => {
+        // Auth/login title
+        const authTitle = document.getElementById('authTitle');
+        if (authTitle) authTitle.textContent = b.companyName || authTitle.textContent;
+
+        // Nav tagline
+        const tagEl = document.getElementById('brandTagline');
+        if (tagEl) tagEl.textContent = b.tagline || '';
+
+        // Logo circle — image or text
+        const flagEl = document.getElementById('currentStateFlag');
+        if (flagEl) {
+            flagEl.style.background = primary;
+            if (b.logoUrl) {
+                flagEl.innerHTML = `<img src="${b.logoUrl}" class="w-8 h-8 object-contain rounded-lg" alt="logo">`;
+            }
+        }
+
+        // Login page logo  
+        const loginLogo = document.getElementById('loginLogo');
+        if (loginLogo) {
+            loginLogo.style.background = primary;
+            if (b.logoUrl) {
+                loginLogo.innerHTML = `<img src="${b.logoUrl}" class="w-14 h-14 object-contain" alt="${b.companyName}">`;
+            } else {
+                loginLogo.textContent = b.logoText || 'BD';
+            }
+        }
+
+        // Login company name text
+        const loginCompany = document.getElementById('loginCompanyName');
+        if (loginCompany) loginCompany.textContent = b.companyName || loginCompany.textContent;
+
+        // Tenders header subtitle
+        const tendersSubtitle = document.querySelector('#content-tenders .display-font');
+        // Powered by footer
+        const poweredBy = document.getElementById('poweredByLine');
+        if (poweredBy) poweredBy.style.display = b.showPoweredBy === false ? 'none' : '';
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyText);
+    } else {
+        applyText();
+    }
+}
+
+// Apply brand immediately (CSS vars) and on DOM ready (text/images)
+applyBrand();
+
+// Firebase Config — from BRAND config above
+const firebaseConfig = BRAND.firebase;
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -1967,12 +2605,186 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+// ==================== COMPANY CONFIG (default — overwritten by Firestore/localStorage on load) ====================
+
+let COMPANY_CONFIG = {
+    // ── Identity ──
+    name:           'Australian Business Development & CRM',
+    shortName:      'AUS BizDev',
+    tagline:        'All States & Territories',
+    logoUrl:        '',           // URL to logo image (leave empty to use icon)
+    logoIcon:       'fa-building',
+    favicon:        '',           // URL to favicon
+
+    // ── Colours ──
+    primaryColor:   '#771414',
+    accentColor:    '#c0392b',
+    primaryText:    '#ffffff',    // text colour on primary bg
+    gradientFrom:   '#771414',
+    gradientTo:     '#c0392b',
+    navBg:          '',           // leave empty to use default glass
+
+    // ── Custom Fields — extra fields shown on tender cards & modal ──
+    // Each: { id, label, type ('text'|'select'|'date'|'number'|'url'), options (for select), showOnCard }
+    customTenderFields: [],
+    customCRMFields:    [],
+
+    // ── Custom Terminology ──
+    terminology: {
+        tender:     'Tender',
+        tenders:    'Tenders',
+        region:     'Region',
+        regions:    'Regions',
+    },
+
+    // ── Feature Flags ──
+    features: {
+        tenders:        true,
+        crm:            true,
+        analytics:      true,
+        feedback:       true,
+        myActions:      true,
+        bulkSelect:     true,
+        darkMode:       true,
+        exportWord:     true,
+        exportExcel:    true,
+        sharePoint:     true,
+        kanbanView:     true,
+        linkedContacts: true,
+        pipeline:       true,
+        dueThisWeek:    true,
+    },
+
+    // ── Footer / Support ──
+    supportEmail:   '',
+    footerText:     '',
+
+    // Internal — don't edit
+    _version:       1,
+    _updatedAt:     '',
+    _updatedBy:     '',
+};
+
+// ==================== BRAND APPLICATION ====================
+
+// Bridge: derive COMPANY_CONFIG from BRAND for backward compat
+const b = window.BRAND || {};
+const COMPANY_CONFIG = {
+    name:         b.companyName  || 'Australian BD & CRM',
+    shortName:    b.companyShort || 'AUS BD',
+    tagline:      b.tagline      || 'Business Development & CRM',
+    logoText:     b.logoText     || 'BD',
+    logoUrl:      b.logoUrl      || '',
+    logoIcon:     'fa-building',
+    primaryColor: b.primaryColor || '#771414',
+    accentColor:  b.accentColor  || '#FFCD00',
+    primaryText:  b.primaryText  || '#ffffff',
+    gradientFrom: b.primaryColor || '#771414',
+    gradientTo:   b.primaryLight || '#a31a1a',
+    features: {
+        tenders:        true,
+        crm:            true,
+        analytics:      true,
+        feedback:       true,
+        myActions:      true,
+        bulkSelect:     true,
+        darkMode:       true,
+        exportWord:     true,
+        exportExcel:    true,
+        sharePoint:     true,
+        kanbanView:     true,
+        linkedContacts: true,
+        ...(b.features || {})
+    }
+};
+
+function applyBrandToUI() {
+    const cfg = COMPANY_CONFIG;
+
+    // ── Auth screen ──
+    const authTitle  = document.getElementById('authTitle');
+    const authTagline = document.getElementById('authTagline');
+    const loginLogo  = document.getElementById('loginLogo');
+    if (authTitle)  authTitle.textContent  = cfg.name;
+    if (authTagline) authTagline.textContent = cfg.tagline;
+    if (loginLogo) {
+        loginLogo.style.background = cfg.primaryColor;
+        if (cfg.logoUrl) {
+            loginLogo.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.name}" class="w-12 h-12 object-contain">`;
+        } else {
+            loginLogo.textContent = cfg.logoText || 'BD';
+        }
+    }
+
+    // ── Nav logo flag ──
+    const flagEl = document.getElementById('currentStateFlag');
+    if (flagEl) {
+        flagEl.style.background = cfg.primaryColor;
+        if (cfg.logoUrl) {
+            flagEl.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.shortName}" class="w-7 h-7 object-contain rounded-lg">`;
+        }
+    }
+    const tagEl = document.getElementById('brandTagline');
+    if (tagEl) tagEl.textContent = cfg.tagline;
+
+    // ── Feature flags: hide tabs/buttons not enabled ──
+    const featureTabMap = {
+        tenders:   'tab-tenders',
+        crm:       'tab-crm',
+        analytics: 'tab-analytics',
+        feedback:  'tab-feedback',
+        myActions: 'tab-myactions',
+    };
+    Object.entries(featureTabMap).forEach(([key, id]) => {
+        const el = document.getElementById(id);
+        if (el && cfg.features[key] === false) el.style.display = 'none';
+    });
+    if (cfg.features.bulkSelect === false) {
+        const btn = document.getElementById('bulkModeBtn');
+        if (btn) btn.style.display = 'none';
+    }
+    if (cfg.features.darkMode === false) {
+        const btn = document.getElementById('darkModeBtn');
+        if (btn) btn.style.display = 'none';
+    }
+    if (cfg.features.kanbanView === false) {
+        ['viewKanban'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    }
+
+    // ── Inject brand CSS overrides ──
+    const styleEl = document.getElementById('brandDynamicStyle') || document.createElement('style');
+    styleEl.id = 'brandDynamicStyle';
+    styleEl.textContent = `
+        :root {
+            --accent: ${cfg.primaryColor};
+            --accent-light: ${cfg.gradientTo};
+            --accent-dark: ${cfg.gradientFrom};
+            --accent-2: ${cfg.accentColor};
+            --primary-text: ${cfg.primaryText};
+        }
+        .zone-filter[data-zone="SEQ"].active { background-color: ${cfg.primaryColor} !important; color: ${cfg.primaryText} !important; }
+        .main-tab.active { color: ${cfg.primaryColor} !important; }
+        .main-tab.active::after { background: ${cfg.primaryColor} !important; }
+        .nav-pill.active { background: ${cfg.primaryColor} !important; border-color: ${cfg.primaryColor} !important; color: ${cfg.primaryText} !important; }
+        .bulk-bar { background: ${cfg.primaryColor} !important; }
+        .region-card { border-left-color: ${cfg.primaryColor} !important; }
+        #addTenderBtn { background-color: ${cfg.primaryColor} !important; }
+    `;
+    if (!document.getElementById('brandDynamicStyle')) document.head.appendChild(styleEl);
+    else document.head.replaceChild(styleEl, document.getElementById('brandDynamicStyle'));
+
+    // ── Default state from BRAND ──
+    if (b.defaultState && window.australianStates?.[b.defaultState]) {
+        // Will be applied when login completes
+    }
+}
+
 // ==================== AUSTRALIAN STATES DATA ====================
 const australianStates = {
     QLD: {
         name: 'Queensland',
         code: 'QLD',
-        color: '#771414',
+        color: (window.BRAND?.primaryColor) || '#771414',
         population: 5419000,
         lgaCount: 77,
         zones: [
@@ -2544,7 +3356,7 @@ function getUserInitials(email) {
     if (!email) return '??';
     
     // If it's a demo user
-    if (email === 'demo' || email === 'demo@local') return 'DM';
+
     
     // Extract initials from email
     const parts = email.split('@')[0].split(/[._-]/);
@@ -2592,7 +3404,7 @@ function createWatermarkHTML(email, date, action) {
 }
 
 function renderWatermarkForItem(item, action) {
-    const email = item.createdBy || item.updatedBy || currentUser?.email || 'demo';
+    const email = item.createdBy || item.updatedBy || currentUser?.email || '';
     const date = item.createdAt || item.updatedAt || new Date().toISOString();
     return createWatermarkHTML(email, date, action);
 }
@@ -2919,6 +3731,7 @@ async function checkUserApproval(user) {
         await initializeDatabase();
         await checkAdminStatus();
         await applyTabPermissions();
+        await loadDynamicBrandConfig(); // load any saved branding overrides
         
     } catch (error) {
         console.error("Error checking approval:", error);
@@ -2926,30 +3739,10 @@ async function checkUserApproval(user) {
     }
 }
 
-function enterDemoMode() {
-    isDemoMode = true;
-    currentUser = { uid: 'demo', email: 'demo@local' };
-    
-    document.getElementById('authModal').classList.add('hidden');
-    document.getElementById('stateSelectorModal').classList.remove('hidden');
-    renderStateSelector();
-    renderStateDropdown();
-    
-    const saved = localStorage.getItem('ausCrmDemoData');
-    if (saved) {
-        database = JSON.parse(saved);
-    }
-    
-    updateSyncStatus('Demo Mode');
-    showToast('Demo mode activated. Select a state to continue.', 'info');
-}
+
 
 function signOut() {
-    if (isDemoMode) {
-        isDemoMode = false;
-        currentUser = null;
-        database = { tenders: [], crmContacts: [], interactions: [] };
-    } else {
+    {
         auth.signOut();
         currentUser = null;
     }
@@ -2957,7 +3750,6 @@ function signOut() {
     document.getElementById('mainApp').classList.add('hidden');
     document.getElementById('stateSelectorModal').classList.add('hidden');
     document.getElementById('authModal').classList.remove('hidden');
-    document.getElementById('demoBadge').classList.add('hidden');
     document.getElementById('adminButton').classList.add('hidden');
 }
 
@@ -3034,10 +3826,6 @@ async function initializeDatabase() {
     }
 }
 async function refreshDataForState() {
-    if (isDemoMode) {
-        // In demo mode, filter the existing data
-        return;
-    }
     
     updateSyncStatus('Loading...');
     
@@ -3086,10 +3874,6 @@ async function refreshDataForState() {
     }
 }
 async function saveData() {
-    if (isDemoMode) {
-        localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
-        return;
-    }
     
     updateSyncStatus('Syncing...');
     
@@ -3242,10 +4026,7 @@ function switchMainTab(tab) {
 let tenderFollowUps = []; // array of { id, description, date, assignees: [] }
 let _approvedUserEmails = []; // cache for follow-up dropdowns
 
-async function populateFollowUpAssignedDropdowns() {
-    if (isDemoMode) {
-        _approvedUserEmails = ['demo@local', 'alice@demo.com', 'bob@demo.com'];
-    } else {
+async function populateFollowUpAssignedDropdowns() { else {
         try {
             const snap = await db.collection('approvedUsers').where('approved','==',true).get();
             _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean);
@@ -3384,7 +4165,7 @@ function filterTendersByStatus(status) {
                 <h2 class="text-xl font-bold display-font mb-1">Filtered: ${statusLabels[status]}</h2>
                 <p class="text-gray-600">${statusTenders.length} tender${statusTenders.length !== 1 ? 's' : ''} across all regions</p>
             </div>
-            <button onclick="currentStatusFilter=null; document.querySelectorAll('[id^=\\"statCard_\\"]').forEach(el=>el.classList.remove('ring-2','ring-offset-1','ring-purple-400','ring-blue-400','ring-green-400','ring-gray-400','ring-yellow-400','ring-red-400')); loadRegion(currentRegion || getCurrentRegions()[0]?.id)"
+            <button onclick="clearStatusFilter()"
                 class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium flex items-center text-gray-700">
                 <i class="fas fa-times mr-2"></i> Clear Filter
             </button>
@@ -3397,6 +4178,14 @@ function filterTendersByStatus(status) {
             }).join('')}
         </div>
     `;
+}
+
+function clearStatusFilter() {
+    currentStatusFilter = null;
+    document.querySelectorAll('[id^="statCard_"]').forEach(el => {
+        el.classList.remove('ring-2', 'ring-offset-1', 'ring-purple-400', 'ring-blue-400', 'ring-green-400', 'ring-gray-400', 'ring-yellow-400', 'ring-red-400');
+    });
+    loadRegion(currentRegion || getCurrentRegions()[0]?.id);
 }
 
 // ==================== CRM CATEGORY FILTER ====================
@@ -3437,7 +4226,7 @@ function exportTendersToWord() {
     const stateTenders = database.tenders.filter(t => t.state === currentState);
     const regions = getCurrentRegions();
     const statusColors = { 'POTENTIAL_UNCONFIRMED': '#7e22ce', 'TO_PRICE': '#1e40af', 'PRICED': '#166534', 'NOT_PRICING': '#6b7280', 'AWARDED': '#92400e', 'NOT_WON': '#991b1b' };
-    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${state.name} Tenders</title><style>body{font-family:Arial,sans-serif;font-size:10pt;} h1{font-size:16pt;color:#771414;} h2{font-size:13pt;color:#333;margin-top:18pt;} table{border-collapse:collapse;width:100%;margin-bottom:12pt;} th{background:#771414;color:white;padding:6pt 8pt;font-size:9pt;} td{padding:5pt 8pt;border:1px solid #ddd;font-size:9pt;} tr:nth-child(even) td{background:#f9f9f9;} .badge{padding:2pt 6pt;border-radius:4pt;font-size:8pt;font-weight:bold;}</style></head><body>`;
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${state.name} Tenders</title><style>body{font-family:Arial,sans-serif;font-size:10pt;} h1{font-size:16pt;color:${COMPANY_CONFIG.primaryColor};} h2{font-size:13pt;color:#333;margin-top:18pt;} table{border-collapse:collapse;width:100%;margin-bottom:12pt;} th{background:${COMPANY_CONFIG.primaryColor};color:white;padding:6pt 8pt;font-size:9pt;} td{padding:5pt 8pt;border:1px solid #ddd;font-size:9pt;} tr:nth-child(even) td{background:#f9f9f9;} .badge{padding:2pt 6pt;border-radius:4pt;font-size:8pt;font-weight:bold;}</style></head><body>`;
     html += `<h1>${state.name} — Tenders &amp; Opportunities Report</h1><p style="color:#666;">Generated: ${new Date().toLocaleDateString('en-AU', {weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p><p>Total tenders: <b>${stateTenders.length}</b></p>`;
     const statusGroups = ['POTENTIAL_UNCONFIRMED','TO_PRICE','PRICED','NOT_PRICING','AWARDED','NOT_WON'];
     const statusLabels = { 'POTENTIAL_UNCONFIRMED':'Potential Unconfirmed','TO_PRICE':'To Price','PRICED':'Priced','NOT_PRICING':'Not Pricing','AWARDED':'Awarded','NOT_WON':'Not Won' };
@@ -3498,7 +4287,7 @@ function exportCRMToWord() {
 }
 
 function exportActionsToExcel() {
-    const userEmail = currentUser?.email || 'demo@local';
+    const userEmail = currentUser?.email || currentUser?.email || '';
     const tenders = (database.tenders || []);
     const regions = getCurrentRegions();
     let csv = 'State,Region,Tender Title,Category,Status,Follow-up Description,Due Date,Assigned To\n';
@@ -3519,7 +4308,7 @@ function exportActionsToExcel() {
 }
 
 function exportActionsToWord() {
-    const userEmail = currentUser?.email || 'demo@local';
+    const userEmail = currentUser?.email || currentUser?.email || '';
     const today = new Date(); today.setHours(0,0,0,0);
     const tenders = (database.tenders || []);
     const regions = getCurrentRegions();
@@ -3792,15 +4581,11 @@ async function deleteTender(id) {
     }
 
     try {
-        if (!isDemoMode && currentUser) {
+        
             await db.collection('tenders').doc(String(id)).delete();
-        }
+        
         
         database.tenders = database.tenders.filter(t => t.id !== id);
-        
-        if (isDemoMode) {
-            localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
-        }
         
         loadRegion(tender.regionId);
         updateAllStats();
@@ -3868,7 +4653,7 @@ async function addTenderComment() {
     
     tender.comments.push(newComment);
     tender.updatedAt = new Date().toISOString();
-    tender.updatedBy = currentUser?.email || 'demo';
+    tender.updatedBy = currentUser?.email || '';
     
     document.getElementById('newTenderComment').value = '';
     
@@ -3931,7 +4716,7 @@ async function saveTender(event) {
         linkedContactIds: [...tenderLinkedContacts],
         attachments: tenderStagedFiles.map(f => ({ name: f.name, size: f.size || 0, type: f.type || '', addedAt: f.addedAt || new Date().toISOString() })),
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.email || 'demo'
+        updatedBy: currentUser?.email || ''
     };
     
     if (status === 'PRICED') {
@@ -3964,7 +4749,7 @@ async function saveTender(event) {
     } else {
         tenderData.id = Date.now();
         tenderData.createdAt = new Date().toISOString();
-        tenderData.createdBy = currentUser?.email || 'demo';
+        tenderData.createdBy = currentUser?.email || '';
         tenderData.comments = [];
         database.tenders.push(tenderData);
     }
@@ -4096,19 +4881,19 @@ async function crmSyncAddNew() {
         notes:       'Added via Tender',
         interactions:[],
         createdAt:   new Date().toISOString(),
-        createdBy:   currentUser?.email || 'demo',
+        createdBy:   currentUser?.email || '',
         updatedAt:   new Date().toISOString(),
-        updatedBy:   currentUser?.email || 'demo'
+        updatedBy:   currentUser?.email || ''
     };
 
     if (!database.crmContacts) database.crmContacts = [];
     database.crmContacts.push(newContact);
 
     try {
-        if (!isDemoMode && currentUser && db) {
+        
             await db.collection('crmContacts').doc(String(newContact.id)).set(newContact);
-        }
-        if (isDemoMode) localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
+        
+        if (isDemoMode) 
         updateAllStats();
         showToast((contact.name || contact.email) + ' added to CRM!', 'success');
     } catch(e) {
@@ -4131,14 +4916,14 @@ async function crmSyncUpdateExisting(existingId) {
     if (!existing.directPhone && contact.phone) existing.directPhone = contact.phone;
     if (!existing.email && contact.email)        existing.email       = contact.email;
     existing.updatedAt = new Date().toISOString();
-    existing.updatedBy = currentUser?.email || 'demo';
+    existing.updatedBy = currentUser?.email || '';
     database.crmContacts[idx] = existing;
 
     try {
-        if (!isDemoMode && currentUser && db) {
+        
             await db.collection('crmContacts').doc(String(existingId)).set(existing);
-        }
-        if (isDemoMode) localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
+        
+        if (isDemoMode) 
         showToast('CRM contact updated!', 'success');
     } catch(e) {
         showToast('CRM update error: ' + e.message, 'error');
@@ -4209,10 +4994,7 @@ function openSharePoint() {
 
 async function populateTenderAssignedDropdown(selectedValue) {
     // Legacy stub - use populateFollowUpAssignedDropdowns() instead
-    selectedValue = selectedValue || '';
-    if (isDemoMode) {
-        _approvedUserEmails = ['demo@local', 'alice@demo.com', 'bob@demo.com'];
-    } else {
+    selectedValue = selectedValue || ''; else {
         try {
             const snapshot = await db.collection('approvedUsers').where('approved', '==', true).get();
             _approvedUserEmails = snapshot.docs.map(doc => doc.data().email).filter(Boolean);
@@ -4225,7 +5007,7 @@ async function populateTenderAssignedDropdown(selectedValue) {
 function renderMyActions() {
     const container = document.getElementById('content-myactions');
     if (!container) return;
-    const userEmail = currentUser && currentUser.email ? currentUser.email : 'demo@local';
+    const userEmail = currentUser?.email || '';
     const today = new Date(); today.setHours(0,0,0,0);
     
     // Collect all follow-up items assigned to this user (supports new multi-followup and legacy)
@@ -4659,7 +5441,7 @@ async function deleteCRMContact(id) {
     try {
         updateSyncStatus('Deleting...');
         
-        if (!isDemoMode && currentUser) {
+        
             await db.collection('crmContacts').doc(String(id)).delete();
             
             const interactionsSnapshot = await db.collection('interactions')
@@ -4669,7 +5451,7 @@ async function deleteCRMContact(id) {
             const batch = db.batch();
             interactionsSnapshot.docs.forEach(doc => {
                 batch.delete(doc.ref);
-            });
+            );
             await batch.commit();
         }
         
@@ -4679,13 +5461,9 @@ async function deleteCRMContact(id) {
             database.interactions = database.interactions.filter(i => i.contactId !== id);
         }
         
-        if (isDemoMode) {
-            localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
-        }
-        
         renderCRMContacts();
         updateAllStats();
-        updateSyncStatus(isDemoMode ? 'Demo Mode' : 'Synced');
+        updateSyncStatus('Synced');
         showToast('Contact and associated interactions deleted successfully', 'success');
         
     } catch (error) {
@@ -4735,7 +5513,7 @@ async function saveCRM(event) {
         followUpDate: document.getElementById('crmFollowUpDate').value,
         priority: document.getElementById('crmPriority').value,
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.email || currentUser?.uid || 'demo'
+        updatedBy: currentUser?.email || currentUser?.uid || ''
     };
 
     if (id) {
@@ -4751,7 +5529,7 @@ async function saveCRM(event) {
         contactData.id = Date.now();
         contactData.interactions = [];
         contactData.createdAt = new Date().toISOString();
-        contactData.createdBy = currentUser?.email || currentUser?.uid || 'demo';
+        contactData.createdBy = currentUser?.email || currentUser?.uid || '';
         database.crmContacts.push(contactData);
     }
 
@@ -4793,7 +5571,7 @@ async function saveInteraction(event) {
         notes: document.getElementById('interactionNotes').value,
         nextSteps: document.getElementById('interactionNextSteps').value,
         createdAt: new Date().toISOString(),
-        createdBy: currentUser?.email || 'demo'
+        createdBy: currentUser?.email || ''
     };
 
     if (!database.interactions) database.interactions = [];
@@ -4931,9 +5709,9 @@ function updateCRMStats() {
 
 function updateSyncStatus(status) {
     const indicator = document.getElementById('syncStatus');
-    if (status === 'Synced' || status === 'Demo Mode') {
-        indicator.innerHTML = `<i class="fas ${isDemoMode ? 'fa-flask' : 'fa-check-circle'} mr-1"></i> ${status}`;
-        indicator.className = isDemoMode ? 'flex items-center text-amber-600' : 'flex items-center text-green-600';
+    if (status === 'Synced') {
+        indicator.innerHTML = `<i class="fas fa-check-circle mr-1"></i> ${status}`;
+        indicator.className = 'flex items-center text-green-600';
     } else if (status === 'Offline') {
         indicator.innerHTML = '<i class="fas fa-wifi-slash mr-1"></i> Offline';
         indicator.className = 'flex items-center text-orange-600';
@@ -5079,14 +5857,15 @@ async function showAdminPanel() {
     
     try {
         const isAdmin = await checkIfAdmin();
-        console.log("Is admin:", isAdmin);
-        
         if (!isAdmin) {
             showToast('Access denied. Admin only.', 'error');
             return;
         }
 
         document.getElementById('adminPanel').classList.remove('hidden');
+
+        // Open Users tab by default, load its data
+        switchAdminTab('users');
         await loadApprovedUsers();
         await loadPendingRequests();
         await loadTabPermissions();
@@ -5245,7 +6024,7 @@ async function saveFeedback(event) {
         feedback: document.getElementById('fbFeedbackText').value.trim(),
         action: document.getElementById('fbAction').value.trim(),
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.email || 'demo'
+        updatedBy: currentUser?.email || ''
     };
 
     if (!database.customerFeedback) database.customerFeedback = [];
@@ -5261,17 +6040,14 @@ async function saveFeedback(event) {
     } else {
         entry.id = Date.now();
         entry.createdAt = new Date().toISOString();
-        entry.createdBy = currentUser?.email || 'demo';
+        entry.createdBy = currentUser?.email || '';
         database.customerFeedback.push(entry);
     }
 
     try {
-        if (!isDemoMode && currentUser && db) {
+        
             await db.collection('customerFeedback').doc(String(entry.id)).set(entry);
-        }
-        if (isDemoMode) {
-            localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
-        }
+        
         closeFeedbackModal();
         renderFeedback();
         updateFeedbackStats();
@@ -5285,10 +6061,10 @@ async function deleteFeedbackEntry(id) {
     if (!confirm('Delete this feedback entry? This cannot be undone.')) return;
     database.customerFeedback = (database.customerFeedback || []).filter(f => f.id !== id);
     try {
-        if (!isDemoMode && currentUser && db) {
+        
             await db.collection('customerFeedback').doc(String(id)).delete();
-        }
-        if (isDemoMode) localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
+        
+        if (isDemoMode) 
         renderFeedback();
         updateFeedbackStats();
         showToast('Feedback deleted', 'success');
@@ -5656,7 +6432,7 @@ async function saveQAItem(event, type, editId) {
         dueDate: document.getElementById('qaItemDueDate').value,
         projectRef: document.getElementById('qaItemProjectRef').value.trim(),
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.email || 'demo'
+        updatedBy: currentUser?.email || ''
     };
     if (type === 'ncr') {
         entry.severity = document.getElementById('qaItemSeverity')?.value;
@@ -5675,15 +6451,15 @@ async function saveQAItem(event, type, editId) {
     } else {
         entry.id = Date.now();
         entry.createdAt = new Date().toISOString();
-        entry.createdBy = currentUser?.email || 'demo';
+        entry.createdBy = currentUser?.email || '';
         database.qaItems.push(entry);
     }
 
     try {
-        if (!isDemoMode && currentUser && db) {
+        
             await db.collection('qaItems').doc(String(entry.id)).set(entry);
-        }
-        if (isDemoMode) localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
+        
+        if (isDemoMode) 
         const modal = document.getElementById('qaModal');
         if (modal) modal.remove();
         renderQASubTab(currentQATab);
@@ -5698,8 +6474,8 @@ async function deleteQAItem(id) {
     if (!confirm('Delete this QA item?')) return;
     database.qaItems = (database.qaItems||[]).filter(i => i.id !== id);
     try {
-        if (!isDemoMode && currentUser && db) await db.collection('qaItems').doc(String(id)).delete();
-        if (isDemoMode) localStorage.setItem('ausCrmDemoData', JSON.stringify(database));
+        await db.collection('qaItems').doc(String(id)).delete();
+        if (isDemoMode) 
         renderQASubTab(currentQATab);
         updateQAStats();
         showToast('Deleted', 'success');
@@ -5715,7 +6491,6 @@ const RESTRICTABLE_TABS = ['tenders', 'crm', 'analytics', 'feedback'];
 let userPermissionsCache = {};
 
 async function applyTabPermissions() {
-    // Demo mode: full access always
     if (isDemoMode) return;
     if (!currentUser) return;
 
@@ -5873,7 +6648,7 @@ function sendAdminNotificationEmail(requesterName, requesterEmail, reason) {
         requester_name:  requesterName,
         requester_email: requesterEmail,
         reason:          reason || 'No reason provided',
-        app_name:        'AUS Business CRM'
+        app_name: COMPANY_CONFIG.shortName
     }).catch(e => console.warn('EmailJS admin notify failed:', e));
 }
 
@@ -5947,7 +6722,7 @@ async function approveAccessRequest(docId) {
             emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.approvalTemplateId, {
                 to_email:  data.email,
                 user_name: data.name,
-                app_name:  'AUS Business CRM'
+                app_name: COMPANY_CONFIG.shortName
             }).catch(e => console.warn('EmailJS approval notify failed:', e));
         }
 
@@ -6028,7 +6803,7 @@ function sendReminderEmail(userEmail, userName, tenderTitle, dueDate, dueType) {
         tender_title: tenderTitle,
         due_date:     new Date(dueDate).toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
         due_type:     dueType,
-        app_name:     'AUS Business CRM'
+        app_name: COMPANY_CONFIG.shortName
     }).catch(e => console.warn('Reminder email failed:', e));
 }
 
@@ -6347,17 +7122,16 @@ async function bulkChangeStatus(newStatus) {
         const t = database.tenders.find(x => x.id === id);
         if (!t) continue;
         t.status = newStatus;
-        if (!isDemoMode && currentUser) {
-            try { await db.collection('tenders').doc(String(id)).update({ status: newStatus }); } catch(e) {}
+        
+            try { await db.collection('tenders').doc(String(id)).update({ status: newStatus ); } catch(e) {}
         }
     }
-    if (isDemoMode) saveDemoData();
     updateAllStats();
     clearBulkSelection();
     bulkMode = false;
     document.body.classList.remove('bulk-mode');
     if (currentTenderView === 'grid') loadRegion(currentRegion);
-    updateSyncStatus(isDemoMode ? 'Demo Mode' : 'Synced');
+    updateSyncStatus('Synced');
     showToast(`${ids.length} tender(s) updated to ${label}`, 'success');
 }
 
@@ -6487,7 +7261,7 @@ function renderTenderLinkedContactsPills() {
 function logActivity(action, entity, name) {
     try {
         const log = JSON.parse(sessionStorage.getItem('crm_activity') || '[]');
-        log.unshift({ action, entity, name, time: new Date().toISOString(), user: currentUser?.email || 'demo' });
+        log.unshift({ action, entity, name, time: new Date().toISOString(), user: currentUser?.email || '' });
         sessionStorage.setItem('crm_activity', JSON.stringify(log.slice(0, 50)));
     } catch(e) {}
 }
@@ -6556,10 +7330,498 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ==================== INITIALIZATION ====================
+// ==================== ADMIN TABS ====================
+
+function switchAdminTab(tab) {
+    document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+    const btn = document.getElementById('adminTab-' + tab);
+    const content = document.getElementById('adminContent-' + tab);
+    if (btn) btn.classList.add('active');
+    if (content) content.classList.remove('hidden');
+
+    if (tab === 'branding')     populateBrandingForm();
+    if (tab === 'features')     populateFeatureFlagsForm();
+    if (tab === 'customfields') populateCustomFieldsForms();
+    if (tab === 'config')       refreshConfigEditor();
+}
+
+// ==================== BRAND CONFIG LOAD / SAVE ====================
+
+// Merge Firestore config on top of the static BRAND baseline
+async function loadDynamicBrandConfig() {
+    const LOCAL_KEY = 'crm_brandConfig';
+    try {
+        
+            const snap = await db.collection('appConfig').doc('brand').get();
+            if (snap.exists) {
+                const saved = snap.data();
+                mergeBrand(saved);
+                return;
+            
+        }
+        const raw = localStorage.getItem(LOCAL_KEY);
+        if (raw) mergeBrand(JSON.parse(raw));
+    } catch(e) {
+        console.warn('Could not load dynamic brand config:', e);
+    }
+}
+
+function mergeBrand(saved) {
+    if (!saved || typeof saved !== 'object') return;
+    // Deep merge saved keys into BRAND
+    Object.keys(saved).forEach(k => {
+        if (k === 'features' && typeof saved[k] === 'object') {
+            BRAND.features = Object.assign({}, BRAND.features, saved[k]);
+        } else if (k === 'terms' && typeof saved[k] === 'object') {
+            BRAND.terms = Object.assign({}, BRAND.terms, saved[k]);
+        } else if (k === 'customTenderFields' || k === 'customCRMFields') {
+            BRAND[k] = saved[k];
+        } else if (k !== 'firebase') { // never overwrite firebase creds
+            BRAND[k] = saved[k];
+        }
+    });
+    applyBrand();
+    applyBrandToUI();
+}
+
+async function saveDynamicBrandConfig(configObj) {
+    const LOCAL_KEY = 'crm_brandConfig';
+    // never store firebase creds in Firestore
+    const toSave = Object.assign({}, configObj);
+    delete toSave.firebase;
+    toSave._savedAt = new Date().toISOString();
+    toSave._savedBy = currentUser?.email || '';
+
+    try {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(toSave));
+        
+            await db.collection('appConfig').doc('brand').set(toSave, { merge: true );
+        }
+    } catch(e) {
+        console.warn('Could not save brand config:', e);
+        throw e;
+    }
+}
+
+// ==================== BRANDING FORM ====================
+
+function populateBrandingForm() {
+    const b = BRAND;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+    set('bc_companyName',  b.companyName  || b.name || '');
+    set('bc_companyShort', b.companyShort || b.shortName || '');
+    set('bc_logoText',     b.logoText     || '');
+    set('bc_tagline',      b.tagline      || '');
+    set('bc_logoUrl',      b.logoUrl      || '');
+    set('bc_faviconUrl',   b.faviconUrl   || '');
+    set('bc_primaryColor',     b.primaryColor  || '#771414');
+    set('bc_primaryColorHex',  b.primaryColor  || '#771414');
+    set('bc_accentColor',      b.accentColor   || '#FFCD00');
+    set('bc_accentColorHex',   b.accentColor   || '#FFCD00');
+    set('bc_primaryLight',     b.primaryLight  || '#a31a1a');
+    set('bc_primaryLightHex',  b.primaryLight  || '#a31a1a');
+    set('bc_primaryText',      b.primaryText   || '#ffffff');
+    set('bc_primaryTextHex',   b.primaryText   || '#ffffff');
+    const hf = document.getElementById('bc_headingFont');
+    if (hf) hf.value = b.headingFont || 'Syne';
+    const bf = document.getElementById('bc_bodyFont');
+    if (bf) bf.value = b.bodyFont || 'DM Sans';
+    livePreviewBrand();
+}
+
+function syncColorFromHex(which) {
+    const hexMap = { primary: 'bc_primaryColor', accent: 'bc_accentColor', primaryLight: 'bc_primaryLight', primaryText: 'bc_primaryText' };
+    const colorEl = document.getElementById(hexMap[which]);
+    const hexEl   = document.getElementById(hexMap[which] + 'Hex');
+    if (!colorEl || !hexEl) return;
+    const v = hexEl.value.trim();
+    if (/^#[0-9a-f]{6}$/i.test(v)) {
+        colorEl.value = v;
+        livePreviewBrand();
+    }
+}
+
+function livePreviewBrand() {
+    const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const primary = get('bc_primaryColor') || '#771414';
+    const logoText = get('bc_logoText') || 'BD';
+    const logoUrl  = get('bc_logoUrl');
+    const name     = get('bc_companyShort') || get('bc_companyName') || 'AUS BD';
+    const tagline  = get('bc_tagline') || '';
+    const hFont    = get('bc_headingFont') || 'Syne';
+    const bFont    = get('bc_bodyFont') || 'DM Sans';
+
+    // Sync hex inputs from color pickers
+    ['primary','accent','primaryLight','primaryText'].forEach(k => {
+        const map = { primary:'bc_primaryColor', accent:'bc_accentColor', primaryLight:'bc_primaryLight', primaryText:'bc_primaryText' };
+        const col = document.getElementById(map[k]);
+        const hex = document.getElementById(map[k] + 'Hex');
+        if (col && hex && document.activeElement !== hex) hex.value = col.value;
+    });
+
+    // Update preview elements
+    const nav = document.getElementById('prev_nav');
+    const logo = document.getElementById('prev_logo');
+    const nameEl = document.getElementById('prev_name');
+    const headingEl = document.getElementById('prev_heading');
+    const taglineEl = document.getElementById('prev_tagline');
+    const btnEl = document.getElementById('prev_btn');
+    const pillEl = document.getElementById('prev_pill');
+    const statNums = document.querySelectorAll('#brandPreviewBox [style*="color:#771414"]');
+
+    if (nav) nav.style.background = primary;
+    if (logo) {
+        logo.style.background = 'rgba(255,255,255,0.2)';
+        logo.innerHTML = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain rounded">` : logoText;
+    }
+    if (nameEl) { nameEl.textContent = name; nameEl.style.fontFamily = `'${hFont}',sans-serif`; }
+    if (headingEl) headingEl.style.fontFamily = `'${hFont}',sans-serif`;
+    if (taglineEl) { taglineEl.textContent = tagline; taglineEl.style.fontFamily = `'${bFont}',sans-serif`; }
+    if (btnEl) { btnEl.style.background = primary; btnEl.style.fontFamily = `'${bFont}',sans-serif`; }
+    if (pillEl) { pillEl.style.background = primary; pillEl.style.fontFamily = `'${bFont}',sans-serif`; }
+    statNums.forEach(el => el.style.color = primary);
+}
+
+function applyPalette(primary, accent, light, text) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    set('bc_primaryColor', primary);     set('bc_primaryColorHex', primary);
+    set('bc_accentColor', accent);       set('bc_accentColorHex', accent);
+    set('bc_primaryLight', light);       set('bc_primaryLightHex', light);
+    set('bc_primaryText', text);         set('bc_primaryTextHex', text);
+    livePreviewBrand();
+}
+
+async function saveBrandConfig() {
+    const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    const headingFont = get('bc_headingFont') || 'Syne';
+    const bodyFont    = get('bc_bodyFont') || 'DM Sans';
+
+    const updates = {
+        companyName:   get('bc_companyName'),
+        companyShort:  get('bc_companyShort'),
+        logoText:      get('bc_logoText'),
+        tagline:       get('bc_tagline'),
+        logoUrl:       get('bc_logoUrl'),
+        faviconUrl:    get('bc_faviconUrl'),
+        primaryColor:  get('bc_primaryColor'),
+        accentColor:   get('bc_accentColor'),
+        primaryLight:  get('bc_primaryLight'),
+        primaryText:   get('bc_primaryText'),
+        headingFont,
+        bodyFont,
+    };
+
+    try {
+        // Load new fonts if different
+        if (headingFont !== BRAND.headingFont || bodyFont !== BRAND.bodyFont) {
+            loadGoogleFonts([headingFont, bodyFont]);
+        }
+
+        await saveDynamicBrandConfig(updates);
+        mergeBrand(updates);
+        showToast('Branding saved & applied!', 'success');
+    } catch(e) {
+        showToast('Error saving branding: ' + e.message, 'error');
+    }
+}
+
+function loadGoogleFonts(fonts) {
+    const families = [...new Set(fonts)].map(f => f.replace(/ /g, '+')).join('&family=');
+    const link = document.getElementById('brandFontLink') || document.createElement('link');
+    link.id = 'brandFontLink';
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${families}&display=swap`;
+    if (!link.parentNode) document.head.appendChild(link);
+}
+
+function resetBrandToDefault() {
+    if (!confirm('Reset branding to the static BRAND config? This will remove any saved overrides.')) return;
+    try {
+        localStorage.removeItem('crm_brandConfig');
+    } catch(e) {}
+    
+        db.collection('appConfig').doc('brand').delete().catch(() => {);
+    }
+    showToast('Branding reset to defaults', 'success');
+    closeAdminPanel();
+    setTimeout(() => location.reload(), 1000);
+}
+
+// ==================== FEATURE FLAGS FORM ====================
+
+const FEATURE_LABELS = {
+    tenders:        { label: 'Tenders & Opportunities',  desc: 'Main tenders tracking tab' },
+    crm:            { label: 'CRM & Contacts',            desc: 'Contact relationship management' },
+    analytics:      { label: 'Analytics & Pipeline',      desc: 'Win rate charts and pipeline value' },
+    feedback:       { label: 'Customer Feedback',         desc: 'Feedback collection and tracking' },
+    myActions:      { label: 'My Actions',                desc: 'Personal follow-up task list' },
+    exportWord:     { label: 'Word Export',               desc: 'Export records as .doc files' },
+    exportExcel:    { label: 'Excel Export',              desc: 'Export records as .csv files' },
+    bulkSelect:     { label: 'Bulk Select',               desc: 'Select multiple tenders to change status' },
+    kanbanView:     { label: 'Kanban Board',              desc: 'Visual board view of tenders by stage' },
+    darkMode:       { label: 'Dark Mode',                 desc: 'Dark theme toggle button' },
+    linkedContacts: { label: 'Linked Contacts',           desc: 'Link CRM contacts to tenders' },
+    sharePoint:     { label: 'SharePoint Links',          desc: 'SharePoint URL field on tenders' },
+};
+
+function populateFeatureFlagsForm() {
+    const container = document.getElementById('featureFlagsList');
+    if (!container) return;
+    container.innerHTML = Object.entries(FEATURE_LABELS).map(([key, info]) => {
+        const checked = BRAND.features?.[key] !== false;
+        return `
+        <div class="feature-toggle">
+            <div class="min-w-0 mr-3">
+                <div class="text-sm font-semibold text-gray-800">${info.label}</div>
+                <div class="text-xs text-gray-500">${info.desc}</div>
+            </div>
+            <label class="toggle-switch flex-shrink-0">
+                <input type="checkbox" id="ff_${key}" ${checked ? 'checked' : ''}>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>`;
+    }).join('');
+
+    // Terminology
+    const terms = document.getElementById('terminologyList');
+    if (!terms) return;
+    const termDefs = [
+        { key: 'tender',  label: 'Singular (e.g. Tender)',   placeholder: 'Tender'  },
+        { key: 'tenders', label: 'Plural (e.g. Tenders)',    placeholder: 'Tenders' },
+        { key: 'region',  label: 'Region singular',          placeholder: 'Region'  },
+        { key: 'regions', label: 'Region plural',            placeholder: 'Regions' },
+        { key: 'council', label: 'Council / Client type',    placeholder: 'Council' },
+    ];
+    terms.innerHTML = termDefs.map(t => `
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">${t.label}</label>
+            <input id="term_${t.key}" type="text" value="${BRAND.terms?.[t.key] || ''}" placeholder="${t.placeholder}"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+        </div>`).join('');
+}
+
+async function saveFeatureFlags() {
+    const features = {};
+    Object.keys(FEATURE_LABELS).forEach(key => {
+        const el = document.getElementById('ff_' + key);
+        features[key] = el ? el.checked : true;
+    });
+    try {
+        await saveDynamicBrandConfig({ features });
+        mergeBrand({ features });
+        showToast('Feature flags saved!', 'success');
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    }
+}
+
+async function saveTerminology() {
+    const terms = {};
+    ['tender','tenders','region','regions','council'].forEach(k => {
+        const el = document.getElementById('term_' + k);
+        if (el && el.value.trim()) terms[k] = el.value.trim();
+    });
+    try {
+        await saveDynamicBrandConfig({ terms });
+        mergeBrand({ terms });
+        showToast('Terminology saved!', 'success');
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    }
+}
+
+// ==================== CUSTOM FIELDS ====================
+
+// In-memory edit state
+let _customTenderFields = [];
+let _customCRMFields    = [];
+
+function populateCustomFieldsForms() {
+    _customTenderFields = JSON.parse(JSON.stringify(BRAND.customTenderFields || []));
+    _customCRMFields    = JSON.parse(JSON.stringify(BRAND.customCRMFields    || []));
+    renderCustomFieldList('tender');
+    renderCustomFieldList('crm');
+}
+
+function renderCustomFieldList(type) {
+    const fields = type === 'tender' ? _customTenderFields : _customCRMFields;
+    const container = document.getElementById(`custom${type === 'tender' ? 'Tender' : 'CRM'}FieldsList`);
+    if (!container) return;
+    if (!fields.length) {
+        container.innerHTML = `<div class="text-xs text-gray-400 italic py-3 text-center">No custom fields yet. Click + Add Field to create one.</div>`;
+        return;
+    }
+    container.innerHTML = fields.map((f, i) => `
+        <div class="custom-field-row">
+            <div class="flex items-center gap-2 mb-2">
+                <input type="text" value="${f.label}" placeholder="Field label"
+                    onchange="updateCustomField('${type}', ${i}, 'label', this.value)"
+                    class="flex-1 rounded-lg border border-gray-200 px-2 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-400">
+                <select onchange="updateCustomField('${type}', ${i}, 'type', this.value)"
+                    class="rounded-lg border border-gray-200 px-2 py-1.5 text-xs focus:outline-none focus:border-blue-400">
+                    ${['text','number','date','url','select'].map(t => `<option value="${t}" ${f.type===t?'selected':''}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join('')}
+                </select>
+                <button onclick="removeCustomField('${type}', ${i})" class="w-7 h-7 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 text-xs flex-shrink-0">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            ${f.type === 'select' ? `
+            <div class="mb-2">
+                <input type="text" value="${(f.options||[]).join(', ')}" placeholder="Option 1, Option 2, Option 3"
+                    onchange="updateCustomField('${type}', ${i}, 'options', this.value.split(',').map(s=>s.trim()).filter(Boolean))"
+                    class="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-xs focus:outline-none focus:border-blue-400">
+                <div class="text-xs text-gray-400 mt-0.5">Comma-separated options</div>
+            </div>` : ''}
+            <div class="flex items-center gap-3">
+                <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+                    <input type="checkbox" ${f.showOnCard ? 'checked' : ''} onchange="updateCustomField('${type}', ${i}, 'showOnCard', this.checked)" class="rounded">
+                    Show on card
+                </label>
+                <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+                    <input type="checkbox" ${f.required ? 'checked' : ''} onchange="updateCustomField('${type}', ${i}, 'required', this.checked)" class="rounded">
+                    Required
+                </label>
+            </div>
+        </div>`).join('');
+}
+
+function addCustomField(type) {
+    const arr = type === 'tender' ? _customTenderFields : _customCRMFields;
+    arr.push({ id: 'cf_' + Date.now(), label: 'New Field', type: 'text', showOnCard: false, required: false, options: [] });
+    renderCustomFieldList(type);
+}
+
+function removeCustomField(type, index) {
+    const arr = type === 'tender' ? _customTenderFields : _customCRMFields;
+    arr.splice(index, 1);
+    renderCustomFieldList(type);
+}
+
+function updateCustomField(type, index, key, value) {
+    const arr = type === 'tender' ? _customTenderFields : _customCRMFields;
+    if (arr[index]) {
+        arr[index][key] = value;
+        if (key === 'type') renderCustomFieldList(type); // re-render to show/hide select options
+    }
+}
+
+async function saveCustomFields() {
+    try {
+        await saveDynamicBrandConfig({ customTenderFields: _customTenderFields, customCRMFields: _customCRMFields });
+        mergeBrand({ customTenderFields: _customTenderFields, customCRMFields: _customCRMFields });
+        showToast('Custom fields saved!', 'success');
+        // Re-render active tender/CRM modals if open? Just inform user to re-open modals.
+    } catch(e) {
+        showToast('Error saving custom fields: ' + e.message, 'error');
+    }
+}
+
+// ==================== JSON CONFIG EDITOR ====================
+
+function refreshConfigEditor() {
+    const el = document.getElementById('configJsonEditor');
+    if (!el) return;
+    const safe = Object.assign({}, BRAND);
+    delete safe.firebase; // don't expose creds in editor
+    el.value = JSON.stringify(safe, null, 2);
+}
+
+async function applyConfigFromEditor() {
+    const el = document.getElementById('configJsonEditor');
+    if (!el) return;
+    try {
+        const parsed = JSON.parse(el.value);
+        await saveDynamicBrandConfig(parsed);
+        mergeBrand(parsed);
+        populateBrandingForm();
+        populateFeatureFlagsForm();
+        showToast('Config applied!', 'success');
+    } catch(e) {
+        showToast('Invalid JSON: ' + e.message, 'error');
+    }
+}
+
+function exportConfigJSON() {
+    const safe = Object.assign({}, BRAND);
+    delete safe.firebase;
+    const blob = new Blob([JSON.stringify(safe, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (BRAND.companyShort || 'brand') + '-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importConfigJSON(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            document.getElementById('configJsonEditor').value = JSON.stringify(parsed, null, 2);
+            showToast('JSON loaded — review and click Apply', 'info');
+        } catch(err) {
+            showToast('Invalid JSON file', 'error');
+        }
+    };
+    reader.readAsText(file);
+    input.value = '';
+}
+
+function copyConfigToClipboard() {
+    const safe = Object.assign({}, BRAND);
+    delete safe.firebase;
+    const js = `const BRAND = ${JSON.stringify(safe, null, 4)};`;
+    navigator.clipboard?.writeText(js).then(() => showToast('BRAND block copied to clipboard!', 'success'))
+        .catch(() => showToast('Copy failed — use the JSON editor instead', 'error'));
+}
+
+// ==================== CUSTOM FIELDS IN TENDER/CRM MODALS ====================
+
+function renderCustomFieldInputs(type, existingValues) {
+    const fields = type === 'tender' ? (BRAND.customTenderFields || []) : (BRAND.customCRMFields || []);
+    if (!fields.length) return '';
+    return fields.map(f => {
+        const val = existingValues?.[f.id] || '';
+        const req = f.required ? 'required' : '';
+        let input = '';
+        if (f.type === 'select') {
+            input = `<select id="cf_input_${f.id}" class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-blue-600 focus:outline-none text-sm" ${req}>
+                <option value="">Select…</option>
+                ${(f.options||[]).map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
+            </select>`;
+        } else {
+            input = `<input type="${f.type}" id="cf_input_${f.id}" value="${val}" placeholder="${f.label}"
+                class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-blue-600 focus:outline-none text-sm" ${req}>`;
+        }
+        return `
+        <div class="col-span-${f.type === 'text' ? '2' : '1'}">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                <i class="fas fa-tag mr-1 text-gray-400"></i> ${f.label}${f.required ? ' <span class="text-red-500">*</span>' : ''}
+            </label>
+            ${input}
+        </div>`;
+    }).join('');
+}
+
+function collectCustomFieldValues(type) {
+    const fields = type === 'tender' ? (BRAND.customTenderFields || []) : (BRAND.customCRMFields || []);
+    const values = {};
+    fields.forEach(f => {
+        const el = document.getElementById('cf_input_' + f.id);
+        if (el) values[f.id] = el.value;
+    });
+    return values;
+}
+
+// ==================== SHOW ADMIN PANEL (updated to load first tab) ====================
 
 document.addEventListener('DOMContentLoaded', function() {
     initDarkMode();
+    applyBrandToUI();
 
     // Close modals on outside click
     window.onclick = function(event) {
