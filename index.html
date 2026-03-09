@@ -62,7 +62,8 @@
   projectId: "queensland-business-reporting",
   storageBucket: "queensland-business-reporting.firebasestorage.app",
   messagingSenderId: "271437640355",
-  appId: "1:271437640355:web:d11f19e2b61c30d5bd8516",
+  appId: "1:271437640355:web:e5accea24c8415fabd8516",
+  measurementId: "G-QQ2TDM9JHX"
 
         },
 
@@ -4006,12 +4007,11 @@ function switchMainTab(tab) {
 let tenderFollowUps = []; // array of { id, description, date, assignees: [] }
 let _approvedUserEmails = []; // cache for follow-up dropdowns
 
-async function populateFollowUpAssignedDropdowns() { else {
-        try {
-            const snap = await db.collection('approvedUsers').where('approved','==',true).get();
-            _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean);
-        } catch(e) { _approvedUserEmails = []; }
-    }
+async function populateFollowUpAssignedDropdowns() {
+    try {
+        const snap = await db.collection('approvedUsers').where('approved','==',true).get();
+        _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean);
+    } catch(e) { _approvedUserEmails = []; }
     renderFollowUpsList();
 }
 
@@ -4970,12 +4970,11 @@ function openSharePoint() {
 
 async function populateTenderAssignedDropdown(selectedValue) {
     // Legacy stub - use populateFollowUpAssignedDropdowns() instead
-    selectedValue = selectedValue || ''; else {
+    selectedValue = selectedValue || '';
         try {
             const snapshot = await db.collection('approvedUsers').where('approved', '==', true).get();
             _approvedUserEmails = snapshot.docs.map(doc => doc.data().email).filter(Boolean);
         } catch(e) { _approvedUserEmails = []; }
-    }
 }
 
 // ==================== MY ACTIONS ====================
@@ -5427,9 +5426,8 @@ async function deleteCRMContact(id) {
             const batch = db.batch();
             interactionsSnapshot.docs.forEach(doc => {
                 batch.delete(doc.ref);
-            );
+            });
             await batch.commit();
-        }
         
         database.crmContacts = database.crmContacts.filter(c => c.id !== id);
         
@@ -7089,9 +7087,7 @@ async function bulkChangeStatus(newStatus) {
         const t = database.tenders.find(x => x.id === id);
         if (!t) continue;
         t.status = newStatus;
-        
-            try { await db.collection('tenders').doc(String(id)).update({ status: newStatus ); } catch(e) {}
-        }
+        try { await db.collection('tenders').doc(String(id)).update({ status: newStatus }); } catch(e) {}
     }
     updateAllStats();
     clearBulkSelection();
@@ -7359,9 +7355,7 @@ async function saveDynamicBrandConfig(configObj) {
 
     try {
         localStorage.setItem(LOCAL_KEY, JSON.stringify(toSave));
-        
-            await db.collection('appConfig').doc('brand').set(toSave, { merge: true );
-        }
+        await db.collection('appConfig').doc('brand').set(toSave, { merge: true });
     } catch(e) {
         console.warn('Could not save brand config:', e);
         throw e;
@@ -7505,8 +7499,7 @@ function resetBrandToDefault() {
         localStorage.removeItem('crm_brandConfig');
     } catch(e) {}
     
-        db.collection('appConfig').doc('brand').delete().catch(() => {);
-    }
+    db.collection('appConfig').doc('brand').delete().catch(() => {});
     showToast('Branding reset to defaults', 'success');
     closeAdminPanel();
     setTimeout(() => location.reload(), 1000);
