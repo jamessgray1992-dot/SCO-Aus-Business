@@ -57,15 +57,13 @@
         // │  FIREBASE  — each client gets their own Firebase project        │
         // └─────────────────────────────────────────────────────────────────┘
         firebase: {
-const firebaseConfig = {
-  apiKey: "AIzaSyACeeQF5c4sKwQxM4LaW4pzlPd7R5HuRSg",
-  authDomain: "queensland-business-reporting.firebaseapp.com",
-  projectId: "queensland-business-reporting",
-  storageBucket: "queensland-business-reporting.firebasestorage.app",
-  messagingSenderId: "271437640355",
-  appId: "1:271437640355:web:e5accea24c8415fabd8516",
-  measurementId: "G-QQ2TDM9JHX"
-};
+          apiKey: "AIzaSyACeeQF5c4sKwQxM4LaW4pzlPd7R5HuRSg",
+          authDomain: "queensland-business-reporting.firebaseapp.com",
+          projectId: "queensland-business-reporting",
+          storageBucket: "queensland-business-reporting.firebasestorage.app",
+          messagingSenderId: "271437640355",
+          appId: "1:271437640355:web:e5accea24c8415fabd8516",
+          measurementId: "G-QQ2TDM9JHX"
         },
 
         // ┌─────────────────────────────────────────────────────────────────┐
@@ -2599,71 +2597,11 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// ==================== COMPANY CONFIG (default — overwritten by Firestore/localStorage on load) ====================
-
-let COMPANY_CONFIG = {
-    // ── Identity ──
-    name:           'Australian Business Development & CRM',
-    shortName:      'AUS BizDev',
-    tagline:        'All States & Territories',
-    logoUrl:        '',           // URL to logo image (leave empty to use icon)
-    logoIcon:       'fa-building',
-    favicon:        '',           // URL to favicon
-
-    // ── Colours ──
-    primaryColor:   '#771414',
-    accentColor:    '#c0392b',
-    primaryText:    '#ffffff',    // text colour on primary bg
-    gradientFrom:   '#771414',
-    gradientTo:     '#c0392b',
-    navBg:          '',           // leave empty to use default glass
-
-    // ── Custom Fields — extra fields shown on tender cards & modal ──
-    // Each: { id, label, type ('text'|'select'|'date'|'number'|'url'), options (for select), showOnCard }
-    customTenderFields: [],
-    customCRMFields:    [],
-
-    // ── Custom Terminology ──
-    terminology: {
-        tender:     'Tender',
-        tenders:    'Tenders',
-        region:     'Region',
-        regions:    'Regions',
-    },
-
-    // ── Feature Flags ──
-    features: {
-        tenders:        true,
-        crm:            true,
-        analytics:      true,
-        feedback:       true,
-        myActions:      true,
-        bulkSelect:     true,
-        darkMode:       true,
-        exportWord:     true,
-        exportExcel:    true,
-        sharePoint:     true,
-        kanbanView:     true,
-        linkedContacts: true,
-        pipeline:       true,
-        dueThisWeek:    true,
-    },
-
-    // ── Footer / Support ──
-    supportEmail:   '',
-    footerText:     '',
-
-    // Internal — don't edit
-    _version:       1,
-    _updatedAt:     '',
-    _updatedBy:     '',
-};
-
 // ==================== BRAND APPLICATION ====================
 
 // Bridge: derive COMPANY_CONFIG from BRAND for backward compat
 const b = window.BRAND || {};
-const COMPANY_CONFIG = {
+let COMPANY_CONFIG = {
     name:         b.companyName  || 'Australian BD & CRM',
     shortName:    b.companyShort || 'AUS BD',
     tagline:      b.tagline      || 'Business Development & CRM',
@@ -3647,89 +3585,143 @@ function signIn() {
         return;
     }
 
+    const btn = document.querySelector('[onclick="signIn()"]');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Signing in…'; btn.disabled = true; }
+
+    const setLoginError = (msg) => {
+        let errEl = document.getElementById('loginError');
+        if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.id = 'loginError';
+            errEl.className = 'mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-start gap-2';
+            document.getElementById('authForm').appendChild(errEl);
+        }
+        errEl.innerHTML = `<i class="fas fa-exclamation-circle mt-0.5 flex-shrink-0"></i><span>${msg}</span>`;
+        errEl.classList.remove('hidden');
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    };
+
+    const clearLoginError = () => {
+        const errEl = document.getElementById('loginError');
+        if (errEl) errEl.classList.add('hidden');
+    };
+
+    clearLoginError();
+
     auth.signInWithEmailAndPassword(email, password)
         .then(async (userCredential) => {
             currentUser = userCredential.user;
             console.log("Login successful:", currentUser.email);
-            
+            if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+
             try {
                 const approvedDoc = await db.collection('approvedUsers').doc(currentUser.uid).get();
-                
-                if (!approvedDoc.exists || !approvedDoc.data().approved) {
-                    console.log("User not approved, signing out...");
+
+                if (!approvedDoc.exists) {
+                    // No approvedUsers collection yet — this is the first/bootstrap user.
+                    // Auto-approve and mark as admin so they can set up the system.
+                    console.log("No approvedUsers doc found — bootstrapping first user as admin");
+                    await db.collection('approvedUsers').doc(currentUser.uid).set({
+                        email:      currentUser.email,
+                        name:       currentUser.displayName || currentUser.email,
+                        approved:   true,
+                        approvedAt: new Date().toISOString(),
+                        approvedBy: 'bootstrap'
+                    });
+                    await db.collection('admins').doc(currentUser.uid).set({
+                        email:     currentUser.email,
+                        grantedAt: new Date().toISOString()
+                    });
+                } else if (!approvedDoc.data().approved) {
                     await auth.signOut();
                     currentUser = null;
-                    showToast('Your account is not authorized. Contact admin.', 'error');
+                    setLoginError('Your account is pending approval. Contact your administrator.');
                     return;
                 }
-                
-                document.getElementById('authModal').classList.add('hidden');
-                document.getElementById('stateSelectorModal').classList.remove('hidden');
-                renderStateSelector();
-                renderStateDropdown();
-                initEmailJS();
-                requestNotificationPermission();
-                setTimeout(checkUpcomingDeadlines, 3000); // check after data loads
-                setInterval(checkUpcomingDeadlines, 3600000); // re-check hourly
-                
-                await initializeDatabase();
-                await checkAdminStatus();
-                await applyTabPermissions();
-                
-                showToast('Welcome back!', 'success');
-                
+
+                await launchApp();
+
             } catch (error) {
                 console.error("Approval check error:", error);
-                showToast('Error checking account status: ' + error.message, 'error');
-                await auth.signOut();
-                currentUser = null;
+                // If Firestore rules block the read, try launching anyway
+                // (user is authenticated — rules issue, not an auth issue)
+                if (error.code === 'permission-denied') {
+                    console.warn("Firestore permission denied on approvedUsers — launching app anyway. Check your Firestore security rules.");
+                    await launchApp();
+                } else {
+                    setLoginError('Error checking account: ' + error.message);
+                    await auth.signOut();
+                    currentUser = null;
+                }
             }
         })
         .catch((error) => {
             console.error("Firebase Auth Error:", error.code, error.message);
-            
-            let errorMessage = error.message;
-            if (error.code === 'auth/user-not-found') {
-                errorMessage = 'No account found with this email.';
-            } else if (error.code === 'auth/wrong-password') {
-                errorMessage = 'Incorrect password.';
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = 'Please enter a valid email address.';
-            } else if (error.code === 'auth/invalid-credential') {
-                errorMessage = 'Invalid email or password.';
-            } else if (error.code === 'auth/too-many-requests') {
-                errorMessage = 'Too many failed attempts. Please try again later.';
-            }
-            
-            showToast('Login failed: ' + errorMessage, 'error');
+            if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+
+            const msgs = {
+                'auth/user-not-found':       'No account found with this email address.',
+                'auth/wrong-password':        'Incorrect password. Please try again.',
+                'auth/invalid-email':         'Please enter a valid email address.',
+                'auth/invalid-credential':    'Invalid email or password. Please check and try again.',
+                'auth/too-many-requests':     'Too many failed attempts. Please wait a few minutes and try again.',
+                'auth/network-request-failed':'Network error. Check your internet connection.',
+                'auth/user-disabled':         'This account has been disabled. Contact your administrator.',
+                'auth/app-not-authorized':    'App not authorised. Check that your domain is added in Firebase Console → Authentication → Settings.',
+            };
+            setLoginError(msgs[error.code] || ('Login failed: ' + error.message));
         });
+}
+
+async function launchApp() {
+    document.getElementById('authModal').classList.add('hidden');
+    document.getElementById('stateSelectorModal').classList.remove('hidden');
+    renderStateSelector();
+    renderStateDropdown();
+    initEmailJS();
+    requestNotificationPermission();
+    setTimeout(checkUpcomingDeadlines, 3000);
+    setInterval(checkUpcomingDeadlines, 3600000);
+
+    await initializeDatabase();
+    await checkAdminStatus();
+    await applyTabPermissions();
+    await loadDynamicBrandConfig();
+
+    showToast('Welcome back!', 'success');
 }
 
 async function checkUserApproval(user) {
     try {
         const approvedDoc = await db.collection('approvedUsers').doc(user.uid).get();
-        
-        if (!approvedDoc.exists || !approvedDoc.data().approved) {
-            console.log("User not approved");
+
+        if (!approvedDoc.exists) {
+            // Bootstrap: first user gets auto-approved as admin
+            await db.collection('approvedUsers').doc(user.uid).set({
+                email: user.email, approved: true,
+                approvedAt: new Date().toISOString(), approvedBy: 'bootstrap'
+            });
+            await db.collection('admins').doc(user.uid).set({
+                email: user.email, grantedAt: new Date().toISOString()
+            });
+        } else if (!approvedDoc.data().approved) {
             await auth.signOut();
             currentUser = null;
-            showToast('Your account is not authorized. Contact admin.', 'error');
+            showToast('Your account is pending approval. Contact your administrator.', 'error');
             return;
         }
-        
-        document.getElementById('authModal').classList.add('hidden');
-        document.getElementById('stateSelectorModal').classList.remove('hidden');
-        renderStateSelector();
-        renderStateDropdown();
-        
-        await initializeDatabase();
-        await checkAdminStatus();
-        await applyTabPermissions();
-        await loadDynamicBrandConfig(); // load any saved branding overrides
-        
+
+        await launchApp();
+
     } catch (error) {
         console.error("Error checking approval:", error);
-        showToast('Error checking account status', 'error');
+        if (error.code === 'permission-denied') {
+            // Firestore rules issue — user is authenticated, launch anyway
+            await launchApp();
+        } else {
+            showToast('Error checking account status: ' + error.message, 'error');
+        }
     }
 }
 
