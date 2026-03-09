@@ -57,16 +57,13 @@
         // │  FIREBASE  — each client gets their own Firebase project        │
         // └─────────────────────────────────────────────────────────────────┘
         firebase: {
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
   apiKey: "AIzaSyACeeQF5c4sKwQxM4LaW4pzlPd7R5HuRSg",
   authDomain: "queensland-business-reporting.firebaseapp.com",
   projectId: "queensland-business-reporting",
   storageBucket: "queensland-business-reporting.firebasestorage.app",
   messagingSenderId: "271437640355",
-  appId: "1:271437640355:web:d11f19e2b61c30d5bd8516",
-  measurementId: "G-XE0LCMYLC5"
-};
+  appId: "1:271437640355:web:e5accea24c8415fabd8516",
+  measurementId: "G-QQ2TDM9JHX"
         },
 
         // ┌─────────────────────────────────────────────────────────────────┐
@@ -805,15 +802,6 @@ const firebaseConfig = {
                     Sign In
                 </button>
 
-                <div class="relative mb-4">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">or</span>
-                    </div>
-                </div>
-
                 <div class="mt-4 pt-4 border-t border-gray-100 text-center">
                     <p class="text-xs text-gray-500">Don't have an account?</p>
                     <button onclick="showRequestAccessModal()" class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium underline-offset-2 hover:underline transition-colors">
@@ -874,7 +862,7 @@ const firebaseConfig = {
         </div>
     </div>
 
-    <!-- Main App (Hidden until auth or demo) -->
+    <!-- Main App (Hidden until authenticated) -->
     <div id="mainApp" class="hidden">
 
         <!-- Navigation -->
@@ -3746,11 +3734,8 @@ async function checkUserApproval(user) {
 
 
 function signOut() {
-    {
-        auth.signOut();
-        currentUser = null;
-    }
-    
+    auth.signOut();
+    currentUser = null;
     document.getElementById('mainApp').classList.add('hidden');
     document.getElementById('stateSelectorModal').classList.add('hidden');
     document.getElementById('authModal').classList.remove('hidden');
@@ -3758,7 +3743,6 @@ function signOut() {
 }
 
 async function checkIfAdmin() {
-    if (isDemoMode) return false;
     if (!currentUser) return false;
     
     try {
@@ -3789,8 +3773,6 @@ async function checkAdminStatus() {
 // ==================== DATABASE FUNCTIONS ====================
 
 async function initializeDatabase() {
-    if (isDemoMode) return;
-    
     try {
         updateSyncStatus('Loading...');
         
@@ -4896,8 +4878,6 @@ async function crmSyncAddNew() {
     try {
         
             await db.collection('crmContacts').doc(String(newContact.id)).set(newContact);
-        
-        if (isDemoMode) 
         updateAllStats();
         showToast((contact.name || contact.email) + ' added to CRM!', 'success');
     } catch(e) {
@@ -4926,8 +4906,6 @@ async function crmSyncUpdateExisting(existingId) {
     try {
         
             await db.collection('crmContacts').doc(String(existingId)).set(existing);
-        
-        if (isDemoMode) 
         showToast('CRM contact updated!', 'success');
     } catch(e) {
         showToast('CRM update error: ' + e.message, 'error');
@@ -5474,10 +5452,7 @@ async function deleteCRMContact(id) {
         console.error('Error deleting contact:', error);
         updateSyncStatus('Error');
         showToast('Error deleting contact: ' + error.message, 'error');
-        
-        if (!isDemoMode) {
-            await initializeDatabase();
-        }
+        await initializeDatabase();
     }
 }
 
@@ -6067,8 +6042,6 @@ async function deleteFeedbackEntry(id) {
     try {
         
             await db.collection('customerFeedback').doc(String(id)).delete();
-        
-        if (isDemoMode) 
         renderFeedback();
         updateFeedbackStats();
         showToast('Feedback deleted', 'success');
@@ -6462,8 +6435,6 @@ async function saveQAItem(event, type, editId) {
     try {
         
             await db.collection('qaItems').doc(String(entry.id)).set(entry);
-        
-        if (isDemoMode) 
         const modal = document.getElementById('qaModal');
         if (modal) modal.remove();
         renderQASubTab(currentQATab);
@@ -6479,7 +6450,6 @@ async function deleteQAItem(id) {
     database.qaItems = (database.qaItems||[]).filter(i => i.id !== id);
     try {
         await db.collection('qaItems').doc(String(id)).delete();
-        if (isDemoMode) 
         renderQASubTab(currentQATab);
         updateQAStats();
         showToast('Deleted', 'success');
@@ -6495,7 +6465,6 @@ const RESTRICTABLE_TABS = ['tenders', 'crm', 'analytics', 'feedback'];
 let userPermissionsCache = {};
 
 async function applyTabPermissions() {
-    if (isDemoMode) return;
     if (!currentUser) return;
 
     // Admins always have full access
@@ -6813,7 +6782,7 @@ function sendReminderEmail(userEmail, userName, tenderTitle, dueDate, dueType) {
 
 // Run the reminder check — called on login and every hour
 function checkUpcomingDeadlines() {
-    if (!currentUser || isDemoMode) return;
+    if (!currentUser) return;
 
     const userEmail = currentUser.email || '';
     const today = new Date(); today.setHours(0,0,0,0);
@@ -7356,13 +7325,10 @@ function switchAdminTab(tab) {
 async function loadDynamicBrandConfig() {
     const LOCAL_KEY = 'crm_brandConfig';
     try {
-        
-            const snap = await db.collection('appConfig').doc('brand').get();
-            if (snap.exists) {
-                const saved = snap.data();
-                mergeBrand(saved);
-                return;
-            
+        const snap = await db.collection('appConfig').doc('brand').get();
+        if (snap.exists) {
+            mergeBrand(snap.data());
+            return;
         }
         const raw = localStorage.getItem(LOCAL_KEY);
         if (raw) mergeBrand(JSON.parse(raw));
