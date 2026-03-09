@@ -6,7 +6,7 @@
     <title>Australian Business Development & CRM System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 
     <!-- Firebase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -25,52 +25,98 @@
             --tas-green: #006747;
             --nt-orange: #E65C00;
             --act-blue: #0055A4;
+            --surface: #f4f3ef;
+            --surface-2: #eeecea;
+            --card-bg: #ffffff;
+            --nav-bg: rgba(255,255,255,0.94);
+            --border: #e8e6e1;
+            --text-primary: #1a1917;
+            --text-secondary: #6b6660;
+            --text-muted: #9c9790;
+            --accent: #771414;
+            --accent-2: #c0392b;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            --radius: 14px;
+            --radius-sm: 8px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f5f0;
-            background-image: radial-gradient(at 0% 0%, rgba(119, 20, 20, 0.03) 0px, transparent 50%);
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--surface);
+            background-image: 
+                radial-gradient(ellipse at 0% 0%, rgba(119,20,20,0.04) 0px, transparent 55%),
+                radial-gradient(ellipse at 100% 100%, rgba(119,20,20,0.02) 0px, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
         }
 
-        h1, h2, h3, .display-font {
-            font-family: 'Space Grotesk', sans-serif;
+        h1, h2, h3, h4, .display-font {
+            font-family: 'Syne', sans-serif;
+            letter-spacing: -0.01em;
         }
 
+        /* ── GLASS PANEL ── */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: var(--shadow-sm);
         }
 
+        /* ── CARD HOVER ── */
         .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+            will-change: transform;
         }
-
         .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
 
+        /* ── REGION CARD ── */
         .region-card {
-            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-            border-left: 4px solid var(--qld-maroon);
+            background: var(--card-bg);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .region-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-left-width: 5px;
         }
 
+        /* ── SKELETON ── */
         .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background: linear-gradient(90deg, #ebe9e4 25%, #e0ddd7 50%, #ebe9e4 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
+            border-radius: var(--radius);
         }
-
         @keyframes loading {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
 
-        .sync-indicator {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        @keyframes slideInRight {
+            from { transform: translateX(110%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes pulse {
@@ -78,149 +124,143 @@
             50% { opacity: .5; }
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(110%); opacity: 0; }
-            to   { transform: translateX(0);    opacity: 1; }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ── PRIORITY ── */
         .priority-high { border-left-color: #dc2626; }
         .priority-medium { border-left-color: #f59e0b; }
         .priority-low { border-left-color: #10b981; }
 
+        /* ── OFFLINE BANNER ── */
         .offline-banner {
             background: linear-gradient(90deg, #f59e0b, #d97706);
             color: white;
             transform: translateY(-100%);
             transition: transform 0.3s;
         }
+        .offline-banner.show { transform: translateY(0); }
 
-        .offline-banner.show {
-            transform: translateY(0);
-        }
+        /* ── SCROLLBAR ── */
+        .region-scroll::-webkit-scrollbar { height: 5px; }
+        .region-scroll::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 3px; }
+        .region-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: var(--surface-2); }
+        ::-webkit-scrollbar-thumb { background: #c5c0b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a09990; }
 
-        .region-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .region-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .region-scroll::-webkit-scrollbar-thumb {
-            background: #771414;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
+        /* ── TOAST ── */
         .toast {
             transform: translateX(120%);
-            transition: transform 0.3s ease-out;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
         }
+        .toast.show { transform: translateX(0); }
 
-        .toast.show {
-            transform: translateX(0);
-        }
-
+        /* ── STAT CARD ── */
         .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: var(--card-bg);
             position: relative;
             overflow: hidden;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
         }
-
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
             background: linear-gradient(90deg, var(--qld-maroon), var(--qld-gold));
         }
-
-        .region-group {
-            background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
-            border: 1px solid #e5e7eb;
+        .stat-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+        .stat-card .stat-num {
+            animation: countUp 0.4s ease both;
         }
 
+        /* ── REGION GROUP ── */
+        .region-group {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ── DEMO BADGE ── */
         .demo-badge {
             background: linear-gradient(90deg, #f59e0b, #d97706);
             color: white;
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 9999px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.05em;
         }
 
+        /* ── MAIN TABS ── */
         .main-tab {
             position: relative;
-            transition: all 0.3s;
+            transition: color 0.2s, opacity 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
         }
-
-        .main-tab.active {
-            color: #771414;
-            font-weight: 600;
-        }
-
+        .main-tab.active { color: var(--accent); font-weight: 600; }
         .main-tab.active::after {
             content: '';
             position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
+            bottom: -1px; left: 0; right: 0;
             height: 3px;
-            background: #771414;
+            background: var(--accent);
             border-radius: 3px 3px 0 0;
         }
+        .main-tab:not(.active):hover { color: var(--text-primary); }
 
-        .status-potential { background: #fdf4ff; color: #7e22ce; }
-        .status-to-price { background: #dbeafe; color: #1e40af; }
-        .status-priced { background: #dcfce7; color: #166534; }
-        .status-not-pricing { background: #f3f4f6; color: #6b7280; }
+        /* ── STATUS BADGES ── */
+        .status-potential { background: #f5f0ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+        .status-to-price { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .status-priced { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .status-not-pricing { background: #f9fafb; color: #4b5563; border: 1px solid #e5e7eb; }
 
+        /* ── CRM CONTACT CARD ── */
         .crm-contact-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            background: var(--card-bg);
             border-left: 4px solid #3b82f6;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
         }
-
+        .crm-contact-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
         .crm-contact-card.category-council { border-left-color: #3b82f6; }
         .crm-contact-card.category-supplier { border-left-color: #10b981; }
         .crm-contact-card.category-contractor { border-left-color: #f59e0b; }
         .crm-contact-card.category-competitor { border-left-color: #ef4444; }
 
-        .interaction-timeline {
-            position: relative;
-            padding-left: 20px;
-        }
-
+        /* ── TIMELINE ── */
+        .interaction-timeline { position: relative; padding-left: 20px; }
         .interaction-timeline::before {
             content: '';
-            position: absolute;
-            left: 6px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e5e7eb;
+            position: absolute; left: 6px; top: 0; bottom: 0;
+            width: 2px; background: var(--border);
         }
-
         .timeline-dot {
-            position: absolute;
-            left: 0;
-            width: 14px;
-            height: 14px;
+            position: absolute; left: 0;
+            width: 14px; height: 14px;
             border-radius: 50%;
             background: #3b82f6;
             border: 3px solid white;
@@ -232,20 +272,20 @@
             border-left: 4px solid #ef4444;
         }
 
+        /* ── CATEGORY BADGE ── */
         .category-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
+            display: inline-flex; align-items: center;
+            padding: 0.2rem 0.6rem;
             border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.03em;
         }
-
         .category-council { background: #dbeafe; color: #1e40af; }
         .category-supplier { background: #d1fae5; color: #065f46; }
         .category-contractor { background: #fef3c7; color: #92400e; }
         .category-competitor { background: #fee2e2; color: #991b1b; }
 
+        /* ── ZONE FILTERS ── */
         .zone-filter[data-zone="SEQ"].active { background-color: #771414 !important; color: white !important; }
         .zone-filter[data-zone="NQ"].active { background-color: #0369a1 !important; color: white !important; }
         .zone-filter[data-zone="CQ"].active { background-color: #059669 !important; color: white !important; }
@@ -253,14 +293,15 @@
         .zone-filter[data-zone="FNQ"].active { background-color: #10b981 !important; color: white !important; }
         .zone-filter[data-zone="GULF"].active { background-color: #8b5cf6 !important; color: white !important; }
 
-        /* State Selector Styles */
+        /* ── STATE CARD ── */
         .state-card {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
             cursor: pointer;
+            border-radius: var(--radius);
         }
         .state-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            box-shadow: var(--shadow-lg);
         }
         .state-card.qld { border-top: 4px solid #771414; }
         .state-card.nsw { border-top: 4px solid #00247D; }
@@ -271,97 +312,247 @@
         .state-card.nt { border-top: 4px solid #E65C00; }
         .state-card.act { border-top: 4px solid #0055A4; }
 
-        /* Watermark Styles */
-        .watermark-container {
-            position: relative;
-        }
+        /* ── WATERMARK ── */
+        .watermark-container { position: relative; }
         .watermark-initials {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 32px;
-            height: 32px;
+            position: absolute; top: 8px; right: 8px;
+            width: 30px; height: 30px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: white;
-            text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800;
+            color: white; text-transform: uppercase;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             z-index: 10;
         }
         .watermark-tooltip {
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s;
-            z-index: 20;
+            position: absolute; top: 42px; right: 0;
+            background: rgba(26,25,23,0.9);
+            color: white; padding: 5px 10px;
+            border-radius: 8px; font-size: 11px;
+            white-space: nowrap; opacity: 0; visibility: hidden;
+            transition: all 0.2s; z-index: 20;
         }
-        .watermark-container:hover .watermark-tooltip {
-            opacity: 1;
-            visibility: visible;
-        }
+        .watermark-container:hover .watermark-tooltip { opacity: 1; visibility: visible; }
 
-        /* State Dropdown */
-        .state-dropdown {
-            position: relative;
-        }
+        /* ── STATE DROPDOWN ── */
+        .state-dropdown { position: relative; }
         .state-dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 220px;
+            position: absolute; top: calc(100% + 8px); left: 0;
+            min-width: 230px;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            border: 1.5px solid var(--border);
             z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s;
+            opacity: 0; visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
         }
         .state-dropdown:hover .state-dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            opacity: 1; visibility: visible; transform: translateY(0);
         }
         .state-dropdown-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: background 0.2s;
+            display: flex; align-items: center;
+            padding: 10px 16px; cursor: pointer;
+            transition: background 0.15s;
         }
-        .state-dropdown-item:hover {
-            background: #f3f4f6;
-        }
-        .state-dropdown-item:first-child {
-            border-radius: 12px 12px 0 0;
-        }
-        .state-dropdown-item:last-child {
-            border-radius: 0 0 12px 12px;
-        }
+        .state-dropdown-item:hover { background: var(--surface); }
+        .state-dropdown-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+        .state-dropdown-item:last-child { border-radius: 0 0 var(--radius) var(--radius); }
         .state-flag {
-            width: 28px;
-            height: 20px;
-            border-radius: 3px;
+            width: 28px; height: 20px; border-radius: 4px;
             margin-right: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; color: white;
+        }
+
+        /* ── PIPELINE FUNNEL ── */
+        .pipeline-bar {
+            height: 10px;
+            border-radius: 99px;
+            transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .pipeline-bar::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* ── DUE THIS WEEK ── */
+        .due-item {
+            border-left: 3px solid;
+            transition: all 0.2s;
+            border-radius: 0 8px 8px 0;
+        }
+        .due-item:hover { transform: translateX(3px); }
+        .due-item.overdue { border-left-color: #ef4444; background: #fef2f2; }
+        .due-item.due-today { border-left-color: #f59e0b; background: #fffbeb; }
+        .due-item.due-soon { border-left-color: #3b82f6; background: #eff6ff; }
+
+        /* ── KANBAN BOARD ── */
+        .kanban-col {
+            min-width: 240px;
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
+        }
+        .kanban-col-header {
+            padding: 12px 16px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .kanban-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin: 8px;
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .kanban-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: #c0b8b0;
+        }
+
+        /* ── BULK SELECT ── */
+        .bulk-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--accent);
             color: white;
+            padding: 14px 24px;
+            display: flex; align-items: center; gap: 16px;
+            z-index: 45;
+            box-shadow: 0 -4px 24px rgba(119,20,20,0.3);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .bulk-bar.show { transform: translateY(0); }
+        .bulk-select-cb {
+            opacity: 0;
+            position: absolute; top: 8px; left: 8px;
+            transition: opacity 0.15s;
+        }
+        .bulk-mode .region-card:hover .bulk-select-cb,
+        .bulk-mode .bulk-select-cb { opacity: 1; }
+        .bulk-mode .region-card { cursor: default; }
+
+        /* ── NAV PILLS ── */
+        .nav-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-size: 0.82rem; font-weight: 500;
+            transition: all 0.2s; cursor: pointer;
+            border: 1.5px solid transparent;
+        }
+        .nav-pill:hover { background: var(--surface); border-color: var(--border); }
+        .nav-pill.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px rgba(119,20,20,0.3);
+        }
+
+        /* ── QUICK STATS BAR ── */
+        .quick-stat {
+            font-size: 0.75rem; font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .quick-stat:hover { background: var(--surface-2); }
+
+        /* ── ACTIVITY FEED ── */
+        .activity-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            animation: slideUp 0.3s ease both;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            flex-shrink: 0; margin-top: 5px;
+        }
+
+        /* ── SEARCH HIGHLIGHT ── */
+        .search-highlight {
+            background: #fef3c7; 
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        /* ── DARK MODE ── */
+        .dark-mode {
+            --surface: #141210;
+            --surface-2: #1c1a17;
+            --card-bg: #201e1b;
+            --border: #2e2b27;
+            --text-primary: #f0ede8;
+            --text-secondary: #9c9790;
+            --text-muted: #5a5650;
+            --nav-bg: rgba(20,18,16,0.95);
+        }
+        .dark-mode body { color: var(--text-primary); }
+        .dark-mode .glass-panel { background: rgba(32,30,27,0.9); border-color: rgba(255,255,255,0.06); }
+        .dark-mode .stat-card,
+        .dark-mode .region-card,
+        .dark-mode .crm-contact-card { background: var(--card-bg); border-color: var(--border); }
+        .dark-mode nav { background: var(--nav-bg) !important; border-color: var(--border) !important; }
+        .dark-mode .bg-white { background: var(--card-bg) !important; }
+        .dark-mode .text-gray-900 { color: var(--text-primary) !important; }
+        .dark-mode .text-gray-600, .dark-mode .text-gray-500 { color: var(--text-secondary) !important; }
+        .dark-mode .border-gray-200 { border-color: var(--border) !important; }
+        .dark-mode input, .dark-mode select, .dark-mode textarea {
+            background: var(--surface-2) !important;
+            border-color: var(--border) !important;
+            color: var(--text-primary) !important;
+        }
+        .dark-mode .bg-gray-50, .dark-mode .bg-gray-100 { background: var(--surface-2) !important; }
+        .dark-mode .region-group { background: var(--surface-2); border-color: var(--border); }
+
+        /* ── VIEW TOGGLE ── */
+        .view-toggle-btn {
+            padding: 6px 12px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text-secondary);
+        }
+        .view-toggle-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .view-toggle-btn:hover:not(.active) { background: var(--surface-2); }
+
+        /* ── KEYBOARD SHORTCUT BADGE ── */
+        kbd {
+            display: inline-block;
+            padding: 1px 5px;
+            font-size: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            font-family: monospace;
         }
     </style>
 <base target="_blank">
@@ -490,35 +681,32 @@
     <div id="mainApp" class="hidden">
 
         <!-- Navigation -->
-        <nav class="glass-panel sticky top-0 z-40 border-b border-gray-200">
+        <nav class="glass-panel sticky top-0 z-40 border-b border-gray-200" id="mainNav">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <div class="flex items-center space-x-4">
                         <!-- State Switcher Dropdown -->
                         <div class="state-dropdown">
-                            <button id="currentStateButton" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                                <div id="currentStateFlag" class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            <button id="currentStateButton" class="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div id="currentStateFlag" class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">
                                     QLD
                                 </div>
                                 <div class="text-left">
-                                    <h1 class="text-lg font-bold text-gray-900 display-font tracking-tight" id="currentStateName">Queensland</h1>
+                                    <h1 class="text-base font-bold text-gray-900 display-font tracking-tight" id="currentStateName">Queensland</h1>
                                     <div class="flex items-center text-xs text-gray-500">
                                         <span id="userEmail"></span>
-                                        <span id="demoBadge" class="hidden demo-badge ml-2">DEMO MODE</span>
+                                        <span id="demoBadge" class="hidden demo-badge ml-2">DEMO</span>
                                     </div>
                                 </div>
-                                <i class="fas fa-chevron-down text-gray-400 ml-2"></i>
+                                <i class="fas fa-chevron-down text-gray-400 ml-1 text-xs"></i>
                             </button>
-                            
                             <div class="state-dropdown-menu">
-                                <div class="px-4 py-2 text-xs font-semibold text-gray-500 border-b">Switch State/Territory</div>
-                                <div id="stateDropdownItems">
-                                    <!-- State items populated by JS -->
-                                </div>
+                                <div class="px-4 py-2 text-xs font-bold text-gray-500 border-b uppercase tracking-wider">Switch State/Territory</div>
+                                <div id="stateDropdownItems"></div>
                             </div>
                         </div>
 
-                        <div class="flex items-center space-x-2 text-xs text-gray-500">
+                        <div class="hidden md:flex items-center space-x-2 text-xs text-gray-500">
                             <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
                             <span id="syncStatus" class="flex items-center text-green-600">
                                 <i class="fas fa-check-circle mr-1"></i> Ready
@@ -526,30 +714,38 @@
                             <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
                             <span class="text-gray-700 font-semibold" id="lgaCount">77 LGAs</span>
                         </div>
+
+                        <!-- Quick stats mini bar -->
+                        <div class="hidden lg:flex items-center gap-2" id="quickStatsBar">
+                            <!-- populated by JS -->
+                        </div>
                     </div>
 
-                    <div class="flex items-center space-x-4">
-                        <button id="adminButton" onclick="showAdminPanel()" class="hidden px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 text-sm font-medium transition-colors shadow-sm">
-                            <i class="fas fa-shield-alt mr-2"></i> Admin
+                    <div class="flex items-center space-x-2">
+                        <!-- Dark mode toggle -->
+                        <button onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle dark mode"
+                            class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors">
+                            <i class="fas fa-moon" id="darkModeIcon"></i>
                         </button>
 
-                        <button onclick="exportToExcel()" class="hidden md:flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
-                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        <button id="adminButton" onclick="showAdminPanel()" class="hidden px-3 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 text-xs font-bold transition-colors shadow-sm">
+                            <i class="fas fa-shield-alt mr-1"></i> Admin
                         </button>
 
-                        <button onclick="shareReport()" class="hidden md:flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
-                            <i class="fas fa-share-alt mr-2"></i> Share
+                        <!-- Bulk select toggle -->
+                        <button onclick="toggleBulkMode()" id="bulkModeBtn" title="Bulk select tenders" class="hidden md:flex w-9 h-9 items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors">
+                            <i class="fas fa-tasks"></i>
                         </button>
 
-                        <button onclick="signOut()" class="px-4 py-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+                        <button onclick="signOut()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors" title="Sign out">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
 
                         <div class="relative">
-                            <input type="text" id="globalSearch" placeholder="Search LGAs..." 
-                                   class="pl-10 pr-4 py-2 rounded-full bg-gray-100 border-none focus:ring-2 focus:ring-blue-600 w-56 text-sm"
+                            <input type="text" id="globalSearch" placeholder="Search…" 
+                                   class="pl-9 pr-3 py-2 rounded-xl bg-gray-100 border-none focus:ring-2 focus:ring-red-200 w-44 text-sm transition-all focus:w-56"
                                    onkeyup="globalSearch()">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
                         </div>
                     </div>
                 </div>
@@ -559,28 +755,44 @@
         <!-- Main Navigation Tabs -->
         <div class="bg-white border-b border-gray-200 sticky top-16 z-30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex space-x-8">
-                    <button onclick="switchMainTab('tenders')" id="tab-tenders" class="main-tab active py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-file-contract mr-2 text-blue-600"></i> Tenders & Opportunities
+                <div class="flex space-x-1 py-2 overflow-x-auto">
+                    <button onclick="switchMainTab('tenders')" id="tab-tenders" class="main-tab nav-pill active">
+                        <i class="fas fa-file-contract text-sm"></i> <span class="hidden sm:inline">Tenders</span>
                     </button>
-                    <button onclick="switchMainTab('crm')" id="tab-crm" class="main-tab py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-users mr-2 text-green-600"></i> CRM & Contacts
+                    <button onclick="switchMainTab('crm')" id="tab-crm" class="main-tab nav-pill">
+                        <i class="fas fa-users text-sm"></i> <span class="hidden sm:inline">CRM</span>
                     </button>
-                    <button onclick="switchMainTab('analytics')" id="tab-analytics" class="main-tab py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-chart-line mr-2 text-purple-600"></i> Analytics & Pipeline
+                    <button onclick="switchMainTab('analytics')" id="tab-analytics" class="main-tab nav-pill">
+                        <i class="fas fa-chart-line text-sm"></i> <span class="hidden sm:inline">Analytics</span>
                     </button>
-                    <button onclick="switchMainTab('feedback')" id="tab-feedback" class="main-tab py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-star mr-2 text-yellow-500"></i> Customer Feedback
+                    <button onclick="switchMainTab('feedback')" id="tab-feedback" class="main-tab nav-pill">
+                        <i class="fas fa-star text-sm"></i> <span class="hidden sm:inline">Feedback</span>
                     </button>
-                    <button onclick="switchMainTab('qa')" id="tab-qa" class="main-tab py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-clipboard-check mr-2 text-teal-600"></i> Quality Assurance
-                    </button>
-                    <button onclick="switchMainTab('myactions')" id="tab-myactions" class="main-tab py-4 px-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                        <i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions
-                        <span id="myActionsCount" class="ml-2 hidden bg-indigo-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    <button onclick="switchMainTab('myactions')" id="tab-myactions" class="main-tab nav-pill">
+                        <i class="fas fa-tasks text-sm"></i> <span class="hidden sm:inline">My Actions</span>
+                        <span id="myActionsCount" class="hidden bg-white text-red-700 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center text-center leading-none">0</span>
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <div id="bulkBar" class="bulk-bar">
+            <i class="fas fa-check-square text-xl"></i>
+            <span id="bulkCount" class="font-bold text-lg">0</span>
+            <span class="text-sm opacity-80">tenders selected</span>
+            <div class="flex items-center gap-2 ml-4 flex-wrap">
+                <span class="text-sm opacity-70 font-medium">Change status to:</span>
+                <button onclick="bulkChangeStatus('POTENTIAL_UNCONFIRMED')" class="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm font-medium transition-all">Potential</button>
+                <button onclick="bulkChangeStatus('TO_PRICE')" class="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm font-medium transition-all">To Price</button>
+                <button onclick="bulkChangeStatus('PRICED')" class="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm font-medium transition-all">Priced</button>
+                <button onclick="bulkChangeStatus('NOT_PRICING')" class="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm font-medium transition-all">Not Pricing</button>
+                <button onclick="bulkChangeStatus('AWARDED')" class="px-3 py-1 bg-yellow-300 text-yellow-900 hover:bg-yellow-200 rounded-lg text-sm font-bold transition-all">Awarded ✓</button>
+                <button onclick="bulkChangeStatus('NOT_WON')" class="px-3 py-1 bg-red-200 text-red-900 hover:bg-red-100 rounded-lg text-sm font-medium transition-all">Not Won</button>
+            </div>
+            <button onclick="clearBulkSelection()" class="ml-auto px-4 py-1.5 border border-white border-opacity-40 rounded-lg text-sm hover:bg-white hover:bg-opacity-10 transition-all">
+                <i class="fas fa-times mr-1"></i> Cancel
+            </button>
         </div>
 
         <!-- Main Content -->
@@ -593,16 +805,32 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-2xl font-bold display-font text-gray-900">Tenders &amp; Opportunities</h2>
-                        <p class="text-sm text-gray-500 mt-1">Manage and track all tenders across regions</p>
+                        <p class="text-sm text-gray-500 mt-1">Manage and track all tenders across regions. <span class="text-purple-600 font-medium">Click a status card to filter all tenders.</span></p>
                     </div>
-                    <button onclick="showAddTenderModal(null)" id="addTenderBtn" class="flex items-center px-5 py-2.5 text-white rounded-xl font-medium shadow-sm hover:opacity-90 transition-all" style="background-color: #771414;">
-                        <i class="fas fa-plus mr-2"></i> Add Tender
-                    </button>
+                    <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <div class="relative group">
+                            <button class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium text-sm transition-all">
+                                <i class="fas fa-download mr-2"></i> Export
+                                <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 hidden group-hover:block w-48">
+                                <button onclick="exportTendersToExcel()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 text-gray-700 flex items-center rounded-t-xl">
+                                    <i class="fas fa-file-excel text-green-600 mr-2"></i> Excel (.xlsx)
+                                </button>
+                                <button onclick="exportTendersToWord()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 text-gray-700 flex items-center rounded-b-xl">
+                                    <i class="fas fa-file-word text-blue-600 mr-2"></i> Word (.doc)
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="showAddTenderModal(null)" id="addTenderBtn" class="flex items-center px-5 py-2.5 text-white rounded-xl font-medium shadow-sm hover:opacity-90 transition-all" style="background-color: #771414;">
+                            <i class="fas fa-plus mr-2"></i> Add Tender
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Dashboard Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-purple-300" onclick="filterTendersByStatus('POTENTIAL_UNCONFIRMED')" id="statCard_POTENTIAL_UNCONFIRMED" title="Click to filter by Potential">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">Potential</p>
@@ -614,7 +842,7 @@
                         </div>
                     </div>
 
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-blue-300" onclick="filterTendersByStatus('TO_PRICE')" id="statCard_TO_PRICE" title="Click to filter by To Price">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">To Price</p>
@@ -626,7 +854,7 @@
                         </div>
                     </div>
 
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-green-300" onclick="filterTendersByStatus('PRICED')" id="statCard_PRICED" title="Click to filter by Priced">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">Priced</p>
@@ -638,7 +866,7 @@
                         </div>
                     </div>
 
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-gray-300" onclick="filterTendersByStatus('NOT_PRICING')" id="statCard_NOT_PRICING" title="Click to filter by Not Pricing">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">Not Pricing</p>
@@ -650,7 +878,7 @@
                         </div>
                     </div>
 
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-yellow-300" onclick="filterTendersByStatus('AWARDED')" id="statCard_AWARDED" title="Click to filter by Awarded">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">Awarded</p>
@@ -663,7 +891,7 @@
                         <p class="text-xs text-gray-500 mt-1">Total: <span id="statTotalValue">-</span></p>
                     </div>
 
-                    <div class="stat-card rounded-xl p-5 shadow-sm">
+                    <div class="stat-card rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-all border-2 border-transparent hover:border-red-300" onclick="filterTendersByStatus('NOT_WON')" id="statCard_NOT_WON" title="Click to filter by Not Won">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-medium text-gray-600 mb-1">Not Won</p>
@@ -676,7 +904,55 @@
                     </div>
                 </div>
 
-                <!-- Region Selector -->
+                <!-- Pipeline Funnel + Due This Week -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Pipeline Funnel -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="font-bold text-gray-900 display-font text-lg">Pipeline Funnel</h3>
+                            <span class="text-xs text-gray-400">Values where available</span>
+                        </div>
+                        <div id="pipelineFunnel" class="space-y-3">
+                            <!-- rendered by JS -->
+                        </div>
+                    </div>
+                    <!-- Due This Week -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 display-font text-base flex items-center gap-2">
+                                <span class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-calendar-week text-amber-600 text-sm"></i>
+                                </span>
+                                Due This Week
+                            </h3>
+                            <span id="dueThisWeekCount" class="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">—</span>
+                        </div>
+                        <div id="dueThisWeekList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                            <!-- rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View toggle + Bulk select toggle -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-medium text-gray-500 mr-1">View:</span>
+                        <button onclick="setTenderView('grid')" id="viewGrid" class="view-toggle-btn active" title="Grid view">
+                            <i class="fas fa-th-large mr-1"></i> Grid
+                        </button>
+                        <button onclick="setTenderView('kanban')" id="viewKanban" class="view-toggle-btn" title="Kanban view">
+                            <i class="fas fa-columns mr-1"></i> Kanban
+                        </button>
+                        <button onclick="setTenderView('list')" id="viewList" class="view-toggle-btn" title="List view">
+                            <i class="fas fa-list mr-1"></i> List
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <kbd>N</kbd> new tender &nbsp;
+                        <kbd>K</kbd> kanban &nbsp;
+                        <kbd>B</kbd> bulk select
+                    </div>
+                </div>
                 <div class="mb-8">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                         <div>
@@ -699,18 +975,40 @@
                             <div class="loading-skeleton w-full h-full rounded-xl"></div>
                         </div>
                     </div>
+                    <!-- Kanban view (hidden by default) -->
+                    <div id="kanbanContent" class="hidden overflow-x-auto pb-4">
+                        <div id="kanbanBoard" class="flex gap-4 min-w-max">
+                            <!-- rendered by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- CRM TAB CONTENT -->
             <div id="content-crm" class="main-content hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold display-font text-gray-900 mb-2">Customer Relationship Management</h2>
-                    <p class="text-gray-600">Manage all your council contacts, suppliers, contractors, and competitors across all LGAs.</p>
+                <div class="mb-6 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-bold display-font text-gray-900 mb-2">Customer Relationship Management</h2>
+                        <p class="text-gray-600">Manage all your council contacts, suppliers, contractors, and competitors across all LGAs. <span class="text-blue-600 font-medium">Click a category card to filter.</span></p>
+                    </div>
+                    <div class="relative group flex-shrink-0 ml-4">
+                        <button class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium text-sm transition-all">
+                            <i class="fas fa-download mr-2"></i> Export
+                            <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 hidden group-hover:block w-48">
+                            <button onclick="exportCRMToExcel()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 text-gray-700 flex items-center rounded-t-xl">
+                                <i class="fas fa-file-excel text-green-600 mr-2"></i> Excel (.xlsx)
+                            </button>
+                            <button onclick="exportCRMToWord()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 text-gray-700 flex items-center rounded-b-xl">
+                                <i class="fas fa-file-word text-blue-600 mr-2"></i> Word (.doc)
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100">
+                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100 cursor-pointer hover:shadow-md transition-all hover:border-blue-400" onclick="filterCRMByCategory('all')" id="crmCard_all" title="Show all contacts">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-blue-600 font-medium">Total Contacts</p>
@@ -719,7 +1017,7 @@
                             <i class="fas fa-address-book text-blue-400 text-2xl"></i>
                         </div>
                     </div>
-                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100">
+                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100 cursor-pointer hover:shadow-md transition-all hover:border-blue-500" onclick="filterCRMByCategory('Council')" id="crmCard_Council" title="Filter by Councils">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-blue-600 font-medium">Councils</p>
@@ -728,7 +1026,7 @@
                             <i class="fas fa-landmark text-blue-400 text-xl"></i>
                         </div>
                     </div>
-                    <div class="bg-green-50 rounded-xl p-5 border border-green-100">
+                    <div class="bg-green-50 rounded-xl p-5 border border-green-100 cursor-pointer hover:shadow-md transition-all hover:border-green-400" onclick="filterCRMByCategory('Supplier')" id="crmCard_Supplier" title="Filter by Suppliers">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-green-600 font-medium">Suppliers</p>
@@ -737,7 +1035,7 @@
                             <i class="fas fa-truck text-green-400 text-xl"></i>
                         </div>
                     </div>
-                    <div class="bg-orange-50 rounded-xl p-5 border border-orange-100">
+                    <div class="bg-orange-50 rounded-xl p-5 border border-orange-100 cursor-pointer hover:shadow-md transition-all hover:border-orange-400" onclick="filterCRMByCategory('Contractor')" id="crmCard_Contractor" title="Filter by Contractors">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-orange-600 font-medium">Contractors</p>
@@ -746,7 +1044,7 @@
                             <i class="fas fa-hard-hat text-orange-400 text-xl"></i>
                         </div>
                     </div>
-                    <div class="bg-red-50 rounded-xl p-5 border border-red-100">
+                    <div class="bg-red-50 rounded-xl p-5 border border-red-100 cursor-pointer hover:shadow-md transition-all hover:border-red-400" onclick="filterCRMByCategory('Competitor')" id="crmCard_Competitor" title="Filter by Competitors">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-red-600 font-medium">Competitors</p>
@@ -835,9 +1133,25 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold mb-4">Performance by Region</h3>
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+                    <h3 class="text-lg font-bold mb-4 display-font">Performance by Region</h3>
                     <div id="regionPerformanceList" class="space-y-3">
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold display-font text-gray-900 flex items-center gap-2">
+                            <span class="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-history text-purple-600 text-sm"></i></span>
+                            Recent Activity
+                        </h3>
+                        <button onclick="renderActivityFeed()" class="text-xs text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-sync-alt mr-1"></i>Refresh
+                        </button>
+                    </div>
+                    <div id="activityFeed" class="divide-y divide-gray-100">
+                        <div class="text-xs text-gray-400 py-4 text-center">No recent activity yet</div>
                     </div>
                 </div>
             </div>
@@ -1233,23 +1547,20 @@
                             <textarea id="tenderDescription" rows="3" class="w-full rounded-lg px-4 py-2 border-2 border-gray-200 focus:border-blue-600 focus:outline-none"></textarea>
                         </div>
 
-                        <!-- Assigned To + Follow-up Date -->
+                        <!-- Follow-ups Section -->
                         <div class="col-span-2 border-t pt-4 mt-2">
-                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                                <i class="fas fa-user-check mr-2 text-indigo-600"></i> Assignment & Follow-up
-                            </h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="col-span-2 md:col-span-1">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
-                                    <select id="tenderAssignedTo" class="w-full rounded-lg px-4 py-2 border-2 border-gray-200 focus:border-indigo-500 focus:outline-none bg-white">
-                                        <option value="">— Unassigned —</option>
-                                    </select>
-                                </div>
-                                <div class="col-span-2 md:col-span-1">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Follow-up Date</label>
-                                    <input type="date" id="tenderFollowUpDate" class="w-full rounded-lg px-4 py-2 border-2 border-gray-200 focus:border-indigo-500 focus:outline-none">
-                                </div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-semibold text-gray-900 flex items-center">
+                                    <i class="fas fa-tasks mr-2 text-indigo-600"></i> Actions & Follow-ups
+                                </h4>
+                                <button type="button" onclick="addFollowUpRow()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 flex items-center">
+                                    <i class="fas fa-plus mr-1"></i> Add Follow-up
+                                </button>
                             </div>
+                            <div id="followUpsList" class="space-y-3">
+                                <!-- Follow-up rows injected here -->
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Each follow-up can have multiple people assigned. Use the + button to add more.</p>
                         </div>
 
                         <!-- SharePoint Link -->
@@ -1262,6 +1573,26 @@
                                 <button type="button" onclick="openSharePoint()" class="px-3 py-2 bg-blue-50 border-2 border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 text-sm font-medium whitespace-nowrap" title="Open SharePoint link">
                                     <i class="fas fa-external-link-alt"></i> Open
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Linked CRM Contacts -->
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-user-tie mr-1 text-green-600"></i> Linked CRM Contacts
+                            </label>
+                            <div id="tenderLinkedContactsPills" class="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                                <span class="text-xs text-gray-400 italic">No contacts linked yet</span>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="tenderContactSearch" placeholder="Search CRM contacts to link…"
+                                    oninput="searchContactsForTender(this.value)"
+                                    onfocus="showTenderContactDropdown()"
+                                    onblur="setTimeout(hideTenderContactDropdown, 160)"
+                                    class="w-full rounded-lg px-4 py-2 border-2 border-gray-200 focus:border-green-500 focus:outline-none text-sm">
+                                <div id="tenderContactDropdown" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-lg shadow-xl mt-1 max-h-40 overflow-y-auto hidden">
+                                    <!-- populated by JS -->
+                                </div>
                             </div>
                         </div>
 
@@ -2802,7 +3133,7 @@ function initializeUI() {
 
 function renderRegionTabs() {
     const container = document.getElementById('regionTabs');
-    const regions = getCurrentRegions();
+    const regions = getCurrentRegions().slice().sort((a, b) => a.name.localeCompare(b.name));
     
     container.innerHTML = regions.map(region => `
         <button onclick="loadRegion('${region.id}')" 
@@ -2865,17 +3196,35 @@ function filterByZone(zone) {
 
 // ==================== MAIN TAB SWITCHING ====================
 
+let currentStatusFilter = null; // tracks active tender status filter
+let currentCRMCategoryFilter = 'all'; // tracks active CRM category filter
+
 function switchMainTab(tab) {
     currentMainTab = tab;
+    currentStatusFilter = null; // reset filter when switching tabs
     
-    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelectorAll('.main-tab').forEach(t => {
+        t.classList.remove('active');
+        // nav-pill vs main-tab styling
+        if (t.classList.contains('nav-pill')) {
+            t.style.background = '';
+            t.style.color = '';
+            t.style.borderColor = '';
+        }
+    });
+    const activeTab = document.getElementById('tab-' + tab);
+    activeTab.classList.add('active');
     
     document.querySelectorAll('.main-content').forEach(c => c.classList.add('hidden'));
     document.getElementById('content-' + tab).classList.remove('hidden');
     
+    // Show/hide bulk mode button
+    const bulkBtn = document.getElementById('bulkModeBtn');
+    if (bulkBtn) bulkBtn.style.display = tab === 'tenders' ? 'flex' : 'none';
+    
     if (tab === 'tenders') {
         loadRegion(currentRegion || getCurrentRegions()[0]?.id);
+        renderDueThisWeek();
     } else if (tab === 'crm') {
         renderCRMContacts();
     } else if (tab === 'analytics') {
@@ -2883,14 +3232,340 @@ function switchMainTab(tab) {
     } else if (tab === 'feedback') {
         populateFbRegionFilter();
         renderFeedback();
-    } else if (tab === 'qa') {
-        renderQA();
     } else if (tab === 'myactions') {
         renderMyActions();
     }
 }
 
-// ==================== TENDER FUNCTIONS ====================
+// ==================== TENDER STATUS FILTER ====================
+
+let tenderFollowUps = []; // array of { id, description, date, assignees: [] }
+let _approvedUserEmails = []; // cache for follow-up dropdowns
+
+async function populateFollowUpAssignedDropdowns() {
+    if (isDemoMode) {
+        _approvedUserEmails = ['demo@local', 'alice@demo.com', 'bob@demo.com'];
+    } else {
+        try {
+            const snap = await db.collection('approvedUsers').where('approved','==',true).get();
+            _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean);
+        } catch(e) { _approvedUserEmails = []; }
+    }
+    renderFollowUpsList();
+}
+
+function addFollowUpRow() {
+    tenderFollowUps.push({
+        id: Date.now() + Math.random(),
+        description: '',
+        date: '',
+        assignees: []
+    });
+    renderFollowUpsList();
+}
+
+function removeFollowUpRow(id) {
+    tenderFollowUps = tenderFollowUps.filter(fu => fu.id !== id);
+    renderFollowUpsList();
+}
+
+function renderFollowUpsList() {
+    const container = document.getElementById('followUpsList');
+    if (!container) return;
+    if (tenderFollowUps.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-400 italic text-center py-3">No follow-ups added yet. Click "Add Follow-up" to create one.</p>';
+        return;
+    }
+    container.innerHTML = tenderFollowUps.map((fu, idx) => {
+        const assigneeOptions = _approvedUserEmails.map(email =>
+            `<option value="${email}" ${fu.assignees.includes(email) ? 'selected' : ''}>${email}</option>`
+        ).join('');
+        const assigneePills = fu.assignees.map(email =>
+            `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs rounded-full font-medium">${email}<button type="button" onclick="removeFollowUpAssignee(${fu.id},'${email}')" class="hover:text-red-600 font-bold">&times;</button></span>`
+        ).join('');
+        return `<div class="bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-3" data-fuid="${fu.id}">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Follow-up #${idx + 1}</span>
+                <button type="button" onclick="removeFollowUpRow(${fu.id})" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Description / Action</label>
+                    <input type="text" value="${fu.description || ''}" placeholder="e.g., Call council to confirm scope" 
+                        oninput="updateFollowUpField(${fu.id},'description',this.value)"
+                        class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm">
+                </div>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Due Date</label>
+                    <input type="date" value="${fu.date || ''}"
+                        oninput="updateFollowUpField(${fu.id},'date',this.value)"
+                        class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Assigned People</label>
+                    <div class="flex flex-wrap gap-1.5 mb-2 min-h-[24px]">${assigneePills || '<span class="text-xs text-gray-400 italic">No one assigned yet</span>'}</div>
+                    <select onchange="addFollowUpAssignee(${fu.id},this)" class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm bg-white">
+                        <option value="">+ Assign someone...</option>
+                        ${assigneeOptions}
+                    </select>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function updateFollowUpField(id, field, value) {
+    const fu = tenderFollowUps.find(f => f.id === id);
+    if (fu) fu[field] = value;
+}
+
+function addFollowUpAssignee(id, selectEl) {
+    const email = selectEl.value;
+    if (!email) return;
+    const fu = tenderFollowUps.find(f => f.id === id);
+    if (fu && !fu.assignees.includes(email)) {
+        fu.assignees.push(email);
+        renderFollowUpsList();
+    }
+    selectEl.value = '';
+}
+
+function removeFollowUpAssignee(id, email) {
+    const fu = tenderFollowUps.find(f => f.id === id);
+    if (fu) {
+        fu.assignees = fu.assignees.filter(a => a !== email);
+        renderFollowUpsList();
+    }
+}
+
+function filterTendersByStatus(status) {
+    // Toggle off if same filter clicked
+    if (currentStatusFilter === status) {
+        currentStatusFilter = null;
+        // Reset stat card highlights
+        document.querySelectorAll('[id^="statCard_"]').forEach(el => {
+            el.classList.remove('ring-2', 'ring-offset-1', 'ring-purple-400', 'ring-blue-400', 'ring-green-400', 'ring-gray-400', 'ring-yellow-400', 'ring-red-400');
+        });
+        loadRegion(currentRegion || getCurrentRegions()[0]?.id);
+        return;
+    }
+
+    currentStatusFilter = status;
+
+    // Highlight active card
+    const colorMap = {
+        'POTENTIAL_UNCONFIRMED': 'ring-purple-400',
+        'TO_PRICE': 'ring-blue-400',
+        'PRICED': 'ring-green-400',
+        'NOT_PRICING': 'ring-gray-400',
+        'AWARDED': 'ring-yellow-400',
+        'NOT_WON': 'ring-red-400'
+    };
+    document.querySelectorAll('[id^="statCard_"]').forEach(el => {
+        el.classList.remove('ring-2', 'ring-offset-1', 'ring-purple-400', 'ring-blue-400', 'ring-green-400', 'ring-gray-400', 'ring-yellow-400', 'ring-red-400');
+    });
+    const activeCard = document.getElementById('statCard_' + status);
+    if (activeCard) activeCard.classList.add('ring-2', 'ring-offset-1', colorMap[status] || 'ring-blue-400');
+
+    const statusTenders = (database.tenders || []).filter(t => t.state === currentState && t.status === status);
+    const regions = getCurrentRegions();
+    const statusLabels = {
+        'POTENTIAL_UNCONFIRMED': 'Potential Unconfirmed',
+        'TO_PRICE': 'To Price',
+        'PRICED': 'Priced',
+        'NOT_PRICING': 'Not Pricing',
+        'AWARDED': 'Awarded',
+        'NOT_WON': 'Not Won'
+    };
+
+    document.getElementById('regionContent').innerHTML = `
+        <div class="glass-panel rounded-2xl p-6 mb-6 flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold display-font mb-1">Filtered: ${statusLabels[status]}</h2>
+                <p class="text-gray-600">${statusTenders.length} tender${statusTenders.length !== 1 ? 's' : ''} across all regions</p>
+            </div>
+            <button onclick="currentStatusFilter=null; document.querySelectorAll('[id^=\\"statCard_\\"]').forEach(el=>el.classList.remove('ring-2','ring-offset-1','ring-purple-400','ring-blue-400','ring-green-400','ring-gray-400','ring-yellow-400','ring-red-400')); loadRegion(currentRegion || getCurrentRegions()[0]?.id)"
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium flex items-center text-gray-700">
+                <i class="fas fa-times mr-2"></i> Clear Filter
+            </button>
+        </div>
+        ${statusTenders.length === 0 ? `<div class="text-center py-12 text-gray-400"><i class="fas fa-inbox text-4xl mb-3"></i><p>No tenders with status "${statusLabels[status]}"</p></div>` : ''}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${statusTenders.map(tender => {
+                const region = regions.find(r => r.id === tender.regionId);
+                return renderTenderCard(tender) + (region ? `<!-- ${region.name} -->` : '');
+            }).join('')}
+        </div>
+    `;
+}
+
+// ==================== CRM CATEGORY FILTER ====================
+
+function filterCRMByCategory(category) {
+    currentCRMCategoryFilter = category;
+    // Update visual highlight on stat cards
+    document.querySelectorAll('[id^="crmCard_"]').forEach(el => {
+        el.classList.remove('ring-2', 'ring-offset-1', 'ring-blue-500');
+    });
+    const activeCard = document.getElementById('crmCard_' + category);
+    if (activeCard) activeCard.classList.add('ring-2', 'ring-offset-1', 'ring-blue-500');
+    // Set the dropdown to match
+    const catFilter = document.getElementById('crmCategoryFilter');
+    if (catFilter) catFilter.value = category;
+    renderCRMContacts();
+}
+
+// ==================== EXPORT FUNCTIONS ====================
+
+function exportTendersToExcel() {
+    const state = getCurrentStateData();
+    const stateTenders = database.tenders.filter(t => t.state === currentState);
+    const regions = getCurrentRegions();
+    let csv = 'State,Region,Title,Category,Status,Est. Value,Closing Date,Contact Name,Contact Email,Contact Phone,Assigned To,Follow-up Date,Description,Created By,Created Date\n';
+    stateTenders.forEach(t => {
+        const region = regions.find(r => r.id === t.regionId);
+        const followUpDate = t.followUps && t.followUps.length > 0 ? t.followUps[0].date : (t.followUpDate || '');
+        const assignedTo = t.followUps && t.followUps.length > 0 ? t.followUps.map(fu => fu.assignees.join('; ')).join(' | ') : (t.assignedTo || '');
+        csv += `"${currentState}","${region?.name || t.regionId}","${(t.title||'').replace(/"/g,'""')}","${t.category||''}","${t.status||''}","${t.value||''}","${t.closingDate||''}","${t.contact?.name||''}","${t.contact?.email||''}","${t.contact?.phone||''}","${assignedTo}","${followUpDate}","${(t.description||'').replace(/"/g,'""').replace(/\n/g,' ')}","${t.createdBy||''}","${t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-AU') : ''}"\n`;
+    });
+    _downloadFile(csv, `${state.code}_Tenders_${_today()}.csv`, 'text/csv');
+    showToast('Tenders exported to Excel/CSV!', 'success');
+}
+
+function exportTendersToWord() {
+    const state = getCurrentStateData();
+    const stateTenders = database.tenders.filter(t => t.state === currentState);
+    const regions = getCurrentRegions();
+    const statusColors = { 'POTENTIAL_UNCONFIRMED': '#7e22ce', 'TO_PRICE': '#1e40af', 'PRICED': '#166534', 'NOT_PRICING': '#6b7280', 'AWARDED': '#92400e', 'NOT_WON': '#991b1b' };
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${state.name} Tenders</title><style>body{font-family:Arial,sans-serif;font-size:10pt;} h1{font-size:16pt;color:#771414;} h2{font-size:13pt;color:#333;margin-top:18pt;} table{border-collapse:collapse;width:100%;margin-bottom:12pt;} th{background:#771414;color:white;padding:6pt 8pt;font-size:9pt;} td{padding:5pt 8pt;border:1px solid #ddd;font-size:9pt;} tr:nth-child(even) td{background:#f9f9f9;} .badge{padding:2pt 6pt;border-radius:4pt;font-size:8pt;font-weight:bold;}</style></head><body>`;
+    html += `<h1>${state.name} — Tenders &amp; Opportunities Report</h1><p style="color:#666;">Generated: ${new Date().toLocaleDateString('en-AU', {weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p><p>Total tenders: <b>${stateTenders.length}</b></p>`;
+    const statusGroups = ['POTENTIAL_UNCONFIRMED','TO_PRICE','PRICED','NOT_PRICING','AWARDED','NOT_WON'];
+    const statusLabels = { 'POTENTIAL_UNCONFIRMED':'Potential Unconfirmed','TO_PRICE':'To Price','PRICED':'Priced','NOT_PRICING':'Not Pricing','AWARDED':'Awarded','NOT_WON':'Not Won' };
+    statusGroups.forEach(status => {
+        const group = stateTenders.filter(t => t.status === status);
+        if (!group.length) return;
+        html += `<h2><span class="badge" style="color:${statusColors[status]}">${statusLabels[status]}</span> — ${group.length} tender${group.length!==1?'s':''}</h2>`;
+        html += `<table><tr><th>Region</th><th>Title</th><th>Category</th><th>Value</th><th>Closing</th><th>Assigned / Follow-up</th></tr>`;
+        group.forEach(t => {
+            const region = regions.find(r => r.id === t.regionId);
+            const followUp = t.followUps && t.followUps.length > 0 ? t.followUps.map(fu => (fu.assignees.join(', ')||'—') + (fu.date ? ' by ' + fu.date : '')).join('<br>') : (t.assignedTo ? t.assignedTo + (t.followUpDate ? ' by ' + t.followUpDate : '') : '—');
+            html += `<tr><td>${region?.name||t.regionId}</td><td><b>${t.title||''}</b>${t.description?'<br><small style="color:#666">'+t.description.substring(0,80)+(t.description.length>80?'...':'')+'</small>':''}</td><td>${t.category||''}</td><td>${t.value||'—'}</td><td>${t.closingDate||'—'}</td><td>${followUp}</td></tr>`;
+        });
+        html += '</table>';
+    });
+    html += '</body></html>';
+    _downloadFile(html, `${state.code}_Tenders_${_today()}.doc`, 'application/msword');
+    showToast('Tenders exported to Word!', 'success');
+}
+
+function exportCRMToExcel() {
+    const state = getCurrentStateData();
+    const contacts = (database.crmContacts || []).filter(c => c.state === currentState);
+    const regions = getCurrentRegions();
+    let csv = 'State,Category,Region(s),Name,Position,Organisation,Email,Direct Phone,Mobile,LinkedIn,Last Contact Date,Last Contact Type,Follow-up Date,Priority,Notes\n';
+    contacts.forEach(c => {
+        const regionNames = (c.regionIds && c.regionIds.length > 0)
+            ? c.regionIds.map(id => regions.find(r => r.id === id)?.name || id).join('; ')
+            : (regions.find(r => r.id === c.regionId)?.name || c.regionId || '');
+        csv += `"${currentState}","${c.category||''}","${regionNames}","${(c.name||'').replace(/"/g,'""')}","${c.position||''}","${c.department||''}","${c.email||''}","${c.directPhone||''}","${c.mobile||''}","${c.linkedIn||''}","${c.lastContactDate||''}","${c.lastContactType||''}","${c.followUpDate||''}","${c.priority||''}","${(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')}"\n`;
+    });
+    _downloadFile(csv, `${state.code}_CRM_${_today()}.csv`, 'text/csv');
+    showToast('CRM contacts exported!', 'success');
+}
+
+function exportCRMToWord() {
+    const state = getCurrentStateData();
+    const contacts = (database.crmContacts || []).filter(c => c.state === currentState);
+    const regions = getCurrentRegions();
+    const catColors = { Council: '#1e40af', Supplier: '#065f46', Contractor: '#92400e', Competitor: '#991b1b' };
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>CRM Contacts</title><style>body{font-family:Arial,sans-serif;font-size:10pt;} h1{font-size:16pt;color:#3b82f6;} h2{font-size:13pt;margin-top:18pt;} table{border-collapse:collapse;width:100%;margin-bottom:12pt;} th{background:#3b82f6;color:white;padding:6pt 8pt;font-size:9pt;} td{padding:5pt 8pt;border:1px solid #ddd;font-size:9pt;} tr:nth-child(even) td{background:#f9f9f9;}</style></head><body>`;
+    html += `<h1>${state.name} — CRM Contacts Report</h1><p style="color:#666;">Generated: ${new Date().toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p><p>Total contacts: <b>${contacts.length}</b></p>`;
+    ['Council','Supplier','Contractor','Competitor'].forEach(cat => {
+        const group = contacts.filter(c => c.category === cat);
+        if (!group.length) return;
+        html += `<h2 style="color:${catColors[cat]}">${cat}s (${group.length})</h2><table><tr><th>Name</th><th>Position</th><th>Organisation</th><th>Region</th><th>Email</th><th>Phone</th><th>Last Contact</th><th>Follow-up</th></tr>`;
+        group.forEach(c => {
+            const regionNames = (c.regionIds && c.regionIds.length > 0)
+                ? c.regionIds.map(id => regions.find(r => r.id === id)?.name || id).join(', ')
+                : (regions.find(r => r.id === c.regionId)?.name || c.regionId || '');
+            html += `<tr><td><b>${c.name||''}</b></td><td>${c.position||''}</td><td>${c.department||''}</td><td>${regionNames}</td><td>${c.email||''}</td><td>${c.directPhone||c.mobile||''}</td><td>${c.lastContactDate||'—'} ${c.lastContactType?'('+c.lastContactType+')':''}</td><td>${c.followUpDate||'—'}</td></tr>`;
+        });
+        html += '</table>';
+    });
+    html += '</body></html>';
+    _downloadFile(html, `${state.code}_CRM_${_today()}.doc`, 'application/msword');
+    showToast('CRM exported to Word!', 'success');
+}
+
+function exportActionsToExcel() {
+    const userEmail = currentUser?.email || 'demo@local';
+    const tenders = (database.tenders || []);
+    const regions = getCurrentRegions();
+    let csv = 'State,Region,Tender Title,Category,Status,Follow-up Description,Due Date,Assigned To\n';
+    tenders.forEach(t => {
+        const region = regions.find(r => r.id === t.regionId);
+        if (t.followUps && t.followUps.length > 0) {
+            t.followUps.forEach(fu => {
+                if (fu.assignees.includes(userEmail) || fu.assignees.length === 0) {
+                    csv += `"${t.state||''}","${region?.name||t.regionId}","${(t.title||'').replace(/"/g,'""')}","${t.category||''}","${t.status||''}","${(fu.description||'').replace(/"/g,'""')}","${fu.date||''}","${fu.assignees.join('; ')}"\n`;
+                }
+            });
+        } else if (t.assignedTo === userEmail || t.assignedTo) {
+            csv += `"${t.state||''}","${region?.name||t.regionId}","${(t.title||'').replace(/"/g,'""')}","${t.category||''}","${t.status||''}","Follow-up","${t.followUpDate||''}","${t.assignedTo||''}"\n`;
+        }
+    });
+    _downloadFile(csv, `My_Actions_${_today()}.csv`, 'text/csv');
+    showToast('Actions exported!', 'success');
+}
+
+function exportActionsToWord() {
+    const userEmail = currentUser?.email || 'demo@local';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tenders = (database.tenders || []);
+    const regions = getCurrentRegions();
+    let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>My Actions</title><style>body{font-family:Arial,sans-serif;font-size:10pt;} h1{font-size:16pt;color:#4f46e5;} h2{font-size:12pt;color:#333;margin-top:14pt;} table{border-collapse:collapse;width:100%;margin-bottom:12pt;} th{background:#4f46e5;color:white;padding:6pt 8pt;} td{padding:5pt 8pt;border:1px solid #ddd;font-size:9pt;} .overdue{color:#dc2626;font-weight:bold;} .due-soon{color:#d97706;}</style></head><body>`;
+    html += `<h1>My Actions &amp; Follow-ups</h1><p>User: <b>${userEmail}</b><br>Generated: ${new Date().toLocaleDateString('en-AU',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>`;
+    const allItems = [];
+    tenders.forEach(t => {
+        const region = regions.find(r => r.id === t.regionId);
+        if (t.followUps && t.followUps.length > 0) {
+            t.followUps.forEach(fu => {
+                if (fu.assignees.includes(userEmail)) {
+                    allItems.push({ t, region, fu, date: fu.date });
+                }
+            });
+        } else if (t.assignedTo === userEmail) {
+            allItems.push({ t, region, fu: { description: 'Follow-up', date: t.followUpDate, assignees: [t.assignedTo] }, date: t.followUpDate });
+        }
+    });
+    const overdue = allItems.filter(i => i.date && new Date(i.date) < today);
+    const upcoming = allItems.filter(i => !i.date || new Date(i.date) >= today);
+    const renderTable = (items, title, cls) => {
+        if (!items.length) return '';
+        let t2 = `<h2 class="${cls}">${title} (${items.length})</h2><table><tr><th>Tender</th><th>Region</th><th>Status</th><th>Action</th><th>Due Date</th><th>All Assignees</th></tr>`;
+        items.forEach(i => {
+            t2 += `<tr><td><b>${i.t.title||''}</b></td><td>${i.region?.name||i.t.regionId}</td><td>${i.t.status?.replaceAll('_',' ')||''}</td><td>${i.fu.description||'Follow-up'}</td><td class="${i.date && new Date(i.date)<today?'overdue':''}">${i.date||'—'}</td><td>${i.fu.assignees.join(', ')||'—'}</td></tr>`;
+        });
+        return t2 + '</table>';
+    };
+    html += renderTable(overdue, '⚠️ Overdue', 'overdue');
+    html += renderTable(upcoming, '✅ Upcoming', '');
+    html += '</body></html>';
+    _downloadFile(html, `My_Actions_${_today()}.doc`, 'application/msword');
+    showToast('Actions exported to Word!', 'success');
+}
+
+function _downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType + ';charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
+
+function _today() { return new Date().toISOString().split('T')[0]; }
+
+// ==================== TENDER STATUS FILTER (end) ====================
 
 function loadRegion(regionId) {
     currentRegion = regionId;
@@ -2972,7 +3647,7 @@ function renderTenderCard(tender) {
             ${commentCount > 0 ? `<div class="text-xs text-blue-600 font-medium"><i class="fas fa-comments mr-1"></i> ${commentCount}</div>` : ''}
         </div>
         ${tender.assignedTo ? `<div class="text-xs text-indigo-700 mt-2 font-medium"><i class="fas fa-user-check mr-1"></i> ${tender.assignedTo}</div>` : ''}
-        ${tender.followUpDate ? `<div class="text-xs text-orange-600 mt-1"><i class="fas fa-bell mr-1"></i> Follow-up: ${formatDate(tender.followUpDate)}</div>` : ''}
+        ${tender.followUps && tender.followUps.length > 0 ? tender.followUps.map(fu => `<div class="text-xs text-orange-600 mt-1 flex items-center gap-1"><i class="fas fa-bell"></i><span>${fu.description || 'Follow-up'}${fu.date ? ': ' + formatDate(fu.date) : ''}</span>${fu.assignees && fu.assignees.length > 0 ? '<span class="text-gray-400">— ' + fu.assignees.join(', ') + '</span>' : ''}</div>`).join('') : (tender.followUpDate ? `<div class="text-xs text-orange-600 mt-1"><i class="fas fa-bell mr-1"></i> Follow-up: ${formatDate(tender.followUpDate)}</div>` : '')}
         ${tender.sharePointUrl ? `<a href="${tender.sharePointUrl}" target="_blank" onclick="event.stopPropagation()" class="text-xs text-blue-500 mt-1 flex items-center hover:underline"><i class="fas fa-link mr-1"></i> SharePoint</a>` : ''}
         ${(tender.attachments && tender.attachments.length > 0) ? `<div class="text-xs text-gray-500 mt-1"><i class="fas fa-paperclip mr-1"></i> ${tender.attachments.length} file${tender.attachments.length > 1 ? 's' : ''}</div>` : ''}
     </div>
@@ -2984,7 +3659,7 @@ function populateTenderRegionDropdown(selectedRegionId) {
     if (!select) return;
     const regions = getCurrentRegions();
     const state   = getCurrentStateData();
-    // Group regions by zone
+    // Group regions by zone, sorted alphabetically within each group
     const zoneMap = {};
     regions.forEach(r => {
         const zone = state.zones && state.zones.find(z => z.id === r.zone);
@@ -2992,8 +3667,12 @@ function populateTenderRegionDropdown(selectedRegionId) {
         if (!zoneMap[zoneName]) zoneMap[zoneName] = [];
         zoneMap[zoneName].push(r);
     });
-    select.innerHTML = '<option value="">— Select a region —</option>';
+    // Sort each zone's regions alphabetically
     Object.keys(zoneMap).forEach(zoneName => {
+        zoneMap[zoneName].sort((a, b) => a.name.localeCompare(b.name));
+    });
+    select.innerHTML = '<option value="">— Select a region —</option>';
+    Object.keys(zoneMap).sort().forEach(zoneName => {
         const grp = document.createElement('optgroup');
         grp.label = zoneName;
         zoneMap[zoneName].forEach(r => {
@@ -3020,14 +3699,18 @@ function showAddTenderModal(regionId) {
     // Populate region dropdown, pre-selecting passed region or current region
     populateTenderRegionDropdown(regionId || currentRegion);
 
-    // Reset new fields
-    document.getElementById('tenderAssignedTo').value = '';
-    document.getElementById('tenderFollowUpDate').value = '';
-    document.getElementById('tenderSharePointUrl').value = '';
+    // Reset follow-ups
+    tenderFollowUps = [];
+    renderFollowUpsList();
+
+    // Reset linked contacts
+    tenderLinkedContacts = [];
+    renderTenderLinkedContactsPills();
+
     tenderStagedFiles = [];
     renderTenderFileList();
 
-    populateTenderAssignedDropdown();
+    populateFollowUpAssignedDropdowns();
     renderTenderComments(null);
     document.getElementById('tenderModal').classList.remove('hidden');
 }
@@ -3073,11 +3756,29 @@ function editTender(id) {
     renderTenderComments(id);
 
     // Populate new fields
-    populateTenderAssignedDropdown(tender.assignedTo || '');
-    document.getElementById('tenderFollowUpDate').value = tender.followUpDate || '';
     document.getElementById('tenderSharePointUrl').value = tender.sharePointUrl || '';
     tenderStagedFiles = tender.attachments ? [...tender.attachments] : [];
     renderTenderFileList();
+
+    // Load follow-ups (support legacy single followUpDate/assignedTo)
+    if (tender.followUps && tender.followUps.length > 0) {
+        tenderFollowUps = JSON.parse(JSON.stringify(tender.followUps));
+    } else if (tender.followUpDate || tender.assignedTo) {
+        tenderFollowUps = [{
+            id: Date.now(),
+            description: 'Follow-up',
+            date: tender.followUpDate || '',
+            assignees: tender.assignedTo ? [tender.assignedTo] : []
+        }];
+    } else {
+        tenderFollowUps = [];
+    }
+    renderFollowUpsList();
+    populateFollowUpAssignedDropdowns();
+
+    // Load linked contacts
+    tenderLinkedContacts = tender.linkedContactIds ? [...tender.linkedContactIds] : [];
+    renderTenderLinkedContactsPills();
 
     document.getElementById('tenderModal').classList.remove('hidden');
 }
@@ -3222,9 +3923,12 @@ async function saveTender(event) {
             email: document.getElementById('tenderContactEmail').value,
             phone: document.getElementById('tenderContactPhone').value
         },
-        assignedTo: document.getElementById('tenderAssignedTo').value || '',
-        followUpDate: document.getElementById('tenderFollowUpDate').value || '',
+        followUps: tenderFollowUps.map(fu => ({...fu})),
+        // Legacy fields for backwards compat with My Actions
+        assignedTo: tenderFollowUps.length > 0 && tenderFollowUps[0].assignees.length > 0 ? tenderFollowUps[0].assignees[0] : '',
+        followUpDate: tenderFollowUps.length > 0 ? tenderFollowUps[0].date : '',
         sharePointUrl: document.getElementById('tenderSharePointUrl').value.trim() || '',
+        linkedContactIds: [...tenderLinkedContacts],
         attachments: tenderStagedFiles.map(f => ({ name: f.name, size: f.size || 0, type: f.type || '', addedAt: f.addedAt || new Date().toISOString() })),
         updatedAt: new Date().toISOString(),
         updatedBy: currentUser?.email || 'demo'
@@ -3271,6 +3975,7 @@ async function saveTender(event) {
         loadRegion(tenderData.regionId);
         updateAllStats();
         showToast('Tender saved successfully!', 'success');
+        logActivity('save', 'tender', tenderData.title);
         if (tenderData.contact && (tenderData.contact.name || tenderData.contact.email)) {
             checkAndOfferCRMSync(tenderData.contact, tenderData.regionId);
         }
@@ -3503,30 +4208,16 @@ function openSharePoint() {
 }
 
 async function populateTenderAssignedDropdown(selectedValue) {
+    // Legacy stub - use populateFollowUpAssignedDropdowns() instead
     selectedValue = selectedValue || '';
-    const select = document.getElementById('tenderAssignedTo');
-    if (!select) return;
-    select.innerHTML = '<option value="">— Unassigned —</option>';
     if (isDemoMode) {
-        ['demo@local', 'alice@demo.com', 'bob@demo.com'].forEach(function(email) {
-            const opt = document.createElement('option');
-            opt.value = email; opt.textContent = email;
-            if (email === selectedValue) opt.selected = true;
-            select.appendChild(opt);
-        });
-        return;
+        _approvedUserEmails = ['demo@local', 'alice@demo.com', 'bob@demo.com'];
+    } else {
+        try {
+            const snapshot = await db.collection('approvedUsers').where('approved', '==', true).get();
+            _approvedUserEmails = snapshot.docs.map(doc => doc.data().email).filter(Boolean);
+        } catch(e) { _approvedUserEmails = []; }
     }
-    try {
-        const snapshot = await db.collection('approvedUsers').where('approved', '==', true).get();
-        snapshot.docs.forEach(function(doc) {
-            const email = doc.data().email;
-            if (!email) return;
-            const opt = document.createElement('option');
-            opt.value = email; opt.textContent = email;
-            if (email === selectedValue) opt.selected = true;
-            select.appendChild(opt);
-        });
-    } catch(e) { console.error('Error loading users for dropdown:', e); }
 }
 
 // ==================== MY ACTIONS ====================
@@ -3536,53 +4227,86 @@ function renderMyActions() {
     if (!container) return;
     const userEmail = currentUser && currentUser.email ? currentUser.email : 'demo@local';
     const today = new Date(); today.setHours(0,0,0,0);
-    const myTenders = (database.tenders || []).filter(function(t) { return t.assignedTo === userEmail; });
-    myTenders.sort(function(a, b) {
-        const aDate = a.followUpDate || a.closingDate || '';
-        const bDate = b.followUpDate || b.closingDate || '';
-        if (!aDate && !bDate) return 0;
-        if (!aDate) return 1;
-        if (!bDate) return -1;
-        return new Date(aDate) - new Date(bDate);
+    
+    // Collect all follow-up items assigned to this user (supports new multi-followup and legacy)
+    const myItems = [];
+    (database.tenders || []).forEach(function(t) {
+        if (t.followUps && t.followUps.length > 0) {
+            t.followUps.forEach(function(fu) {
+                if (fu.assignees && fu.assignees.includes(userEmail)) {
+                    myItems.push({ tender: t, followUp: fu, sortDate: fu.date || '' });
+                }
+            });
+        } else if (t.assignedTo === userEmail) {
+            myItems.push({ tender: t, followUp: { description: 'Follow-up', date: t.followUpDate || '', assignees: [t.assignedTo] }, sortDate: t.followUpDate || t.closingDate || '' });
+        }
     });
+    
+    myItems.sort(function(a, b) {
+        if (!a.sortDate && !b.sortDate) return 0;
+        if (!a.sortDate) return 1;
+        if (!b.sortDate) return -1;
+        return new Date(a.sortDate) - new Date(b.sortDate);
+    });
+    
+    // For badge count use unique tenders
+    const uniqueTenderIds = new Set(myItems.map(i => i.tender.id));
+    const myTenders = Array.from(uniqueTenderIds);
+    
     const badge = document.getElementById('myActionsCount');
     if (badge) {
-        if (myTenders.length > 0) { badge.textContent = myTenders.length; badge.classList.remove('hidden'); }
+        if (myItems.length > 0) { badge.textContent = myItems.length; badge.classList.remove('hidden'); }
         else { badge.classList.add('hidden'); }
     }
     if (myTenders.length === 0) {
-        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No tenders assigned to you</p><p class="text-sm mt-1">Tenders assigned to <strong>' + userEmail + '</strong> will appear here.</p></div>';
+        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userEmail + '</strong> will appear here.</p></div>';
         return;
     }
-    const overdue = myTenders.filter(function(t) { const d = t.followUpDate || t.closingDate; return d && new Date(d) < today; });
-    const upcoming = myTenders.filter(function(t) { const d = t.followUpDate || t.closingDate; return !d || new Date(d) >= today; });
+    if (myItems.length === 0) {
+        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userEmail + '</strong> will appear here.</p></div>';
+        return;
+    }
+    const overdue = myItems.filter(function(i) { const d = i.sortDate; return d && new Date(d) < today; });
+    const upcoming = myItems.filter(function(i) { const d = i.sortDate; return !d || new Date(d) >= today; });
     const statusColors = { 'POTENTIAL_UNCONFIRMED': 'status-potential', 'TO_PRICE': 'status-to-price', 'PRICED': 'status-priced', 'NOT_PRICING': 'status-not-pricing', 'AWARDED': 'bg-yellow-100 text-yellow-800', 'NOT_WON': 'bg-red-100 text-red-800' };
     function renderGroup(items, title, color) {
         if (items.length === 0) return '';
-        const cards = items.map(function(t) {
+        const cards = items.map(function(item) {
+            const t = item.tender;
+            const fu = item.followUp;
             const region = getCurrentStateData().regions && getCurrentStateData().regions.find(function(r) { return r.id === t.regionId; });
-            const attachCount = t.attachments ? t.attachments.length : 0;
-            const dateLabel = t.followUpDate
-                ? '<span class="text-xs ' + color + ' font-medium"><i class="fas fa-bell mr-1"></i> Follow-up: ' + formatDate(t.followUpDate) + '</span>'
-                : t.closingDate ? '<span class="text-xs text-gray-500"><i class="fas fa-calendar mr-1"></i> Closes: ' + formatDate(t.closingDate) + '</span>' : '';
+            const dateLabel = fu.date
+                ? '<span class="text-xs ' + color + ' font-medium"><i class="fas fa-bell mr-1"></i> Due: ' + formatDate(fu.date) + '</span>'
+                : (t.closingDate ? '<span class="text-xs text-gray-500"><i class="fas fa-calendar mr-1"></i> Closes: ' + formatDate(t.closingDate) + '</span>' : '');
+            const allAssignees = fu.assignees && fu.assignees.length > 1
+                ? '<div class="flex flex-wrap gap-1 mt-1">' + fu.assignees.map(function(a){ return '<span class="text-xs px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">' + a + '</span>'; }).join('') + '</div>'
+                : '';
             return '<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200 card-hover cursor-pointer" onclick="jumpToTender(' + t.id + ')">' +
                 '<div class="flex justify-between items-start mb-2">' +
                 '<span class="text-xs font-semibold px-2 py-1 rounded ' + (statusColors[t.status] || 'bg-gray-100') + '">' + t.status.replaceAll('_',' ') + '</span>' +
                 '<button onclick="event.stopPropagation(); editTender(' + t.id + ')" class="text-xs text-blue-600 hover:underline"><i class="fas fa-edit"></i></button></div>' +
                 '<h3 class="font-bold text-gray-900 mb-1 line-clamp-2">' + t.title + '</h3>' +
+                (fu.description && fu.description !== 'Follow-up' ? '<p class="text-xs text-indigo-700 font-medium mb-1"><i class="fas fa-tasks mr-1"></i>' + fu.description + '</p>' : '') +
                 '<p class="text-xs text-gray-500 mb-2">' + (region ? region.name : t.regionId) + ' &bull; ' + t.category + '</p>' +
                 (t.value ? '<p class="text-sm text-gray-700 mb-2 font-medium">' + t.value + '</p>' : '') +
-                '<div class="flex flex-wrap gap-2 items-center">' + dateLabel +
-                (t.sharePointUrl ? '<a href="' + t.sharePointUrl + '" target="_blank" onclick="event.stopPropagation()" class="text-xs text-blue-500 hover:underline"><i class="fas fa-link mr-1"></i>SharePoint</a>' : '') +
-                (attachCount > 0 ? '<span class="text-xs text-gray-500"><i class="fas fa-paperclip mr-1"></i>' + attachCount + ' file' + (attachCount>1?'s':'') + '</span>' : '') +
-                '</div></div>';
+                '<div class="flex flex-wrap gap-2 items-center">' + dateLabel + '</div>' +
+                allAssignees +
+                '</div>';
         }).join('');
         return '<div class="mb-8"><h3 class="text-lg font-bold ' + color + ' mb-4 flex items-center"><span class="w-2 h-2 rounded-full bg-current mr-2 inline-block"></span>' + title + ' (' + items.length + ')</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' + cards + '</div></div>';
     }
     container.innerHTML =
         '<div class="mb-6 flex justify-between items-center">' +
-        '<div><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to <strong>' + userEmail + '</strong></p></div>' +
-        '<div class="text-sm text-gray-500 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100"><span class="font-bold text-indigo-700 text-lg">' + myTenders.length + '</span> total assigned</div></div>' +
+        '<div><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Follow-ups assigned to <strong>' + userEmail + '</strong></p></div>' +
+        '<div class="flex items-center gap-3">' +
+        '<div class="text-sm text-gray-500 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100"><span class="font-bold text-indigo-700 text-lg">' + myItems.length + '</span> total assigned</div>' +
+        '<div class="relative group">' +
+        '<button class="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium text-sm"><i class="fas fa-download mr-2"></i> Export <i class="fas fa-chevron-down ml-2 text-xs"></i></button>' +
+        '<div class="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 hidden group-hover:block w-48">' +
+        '<button onclick="exportActionsToExcel()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-green-50 text-gray-700 flex items-center rounded-t-xl"><i class="fas fa-file-excel text-green-600 mr-2"></i> Excel (.xlsx)</button>' +
+        '<button onclick="exportActionsToWord()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 text-gray-700 flex items-center rounded-b-xl"><i class="fas fa-file-word text-blue-600 mr-2"></i> Word (.doc)</button>' +
+        '</div></div>' +
+        '</div></div>' +
         renderGroup(overdue, 'Overdue / Past Due', 'text-red-600') +
         renderGroup(upcoming, 'Upcoming & Active', 'text-indigo-700');
 }
@@ -3709,8 +4433,14 @@ function setCrmRegionsFromData(regionId, regionIds) {
 function renderCRMContacts() {
     const container = document.getElementById('crmContactsList');
     const searchQuery = document.getElementById('crmSearch')?.value?.toLowerCase() || '';
-    const categoryFilter = document.getElementById('crmCategoryFilter')?.value || 'all';
+    // Use the dropdown OR the currentCRMCategoryFilter (card click wins if not 'all')
+    const dropdownFilter = document.getElementById('crmCategoryFilter')?.value || 'all';
+    const categoryFilter = currentCRMCategoryFilter !== 'all' ? currentCRMCategoryFilter : dropdownFilter;
     const regionFilter = document.getElementById('crmRegionFilter')?.value || 'all';
+    
+    // Sync dropdown to match card filter
+    const catEl = document.getElementById('crmCategoryFilter');
+    if (catEl && catEl.value !== categoryFilter) catEl.value = categoryFilter;
     
     // Start with ALL contacts, then filter by current state FIRST
     let contacts = database.crmContacts || [];
@@ -3870,6 +4600,9 @@ function searchCRM() {
 }
 
 function filterCRM() {
+    // When user changes dropdown, reset card-based filter
+    currentCRMCategoryFilter = 'all';
+    document.querySelectorAll('[id^="crmCard_"]').forEach(el => el.classList.remove('ring-2', 'ring-offset-1', 'ring-blue-500'));
     renderCRMContacts();
 }
 
@@ -4148,6 +4881,9 @@ function renderAnalytics() {
         </div>
         `;
     }).join('');
+
+    // Activity feed
+    renderActivityFeed();
 }
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -4176,6 +4912,11 @@ function updateAllStats() {
     document.getElementById('statTotalValue').textContent = formatCurrency(totalAwarded);
 
     updateCRMStats();
+
+    // New widgets
+    renderPipelineFunnel();
+    renderDueThisWeek();
+    updateQuickStatsBar();
 }
 
 function updateCRMStats() {
@@ -5307,9 +6048,22 @@ function checkUpcomingDeadlines() {
     const dueTomorrow = [];
 
     myTenders.forEach(t => {
-        if (t.followUpDate === tomorrowStr) {
-            dueTomorrow.push({ tender: t, dateStr: t.followUpDate, type: 'Follow-up date' });
-        } else if (t.closingDate === tomorrowStr) {
+        // Check new multi-followup structure
+        if (t.followUps && t.followUps.length > 0) {
+            t.followUps.forEach(fu => {
+                if (fu.date === tomorrowStr && fu.assignees && fu.assignees.includes(userEmail)) {
+                    dueTomorrow.push({ tender: t, dateStr: fu.date, type: fu.description || 'Follow-up' });
+                }
+            });
+        } else {
+            // Legacy
+            if (t.followUpDate === tomorrowStr) {
+                dueTomorrow.push({ tender: t, dateStr: t.followUpDate, type: 'Follow-up date' });
+            } else if (t.closingDate === tomorrowStr) {
+                dueTomorrow.push({ tender: t, dateStr: t.closingDate, type: 'Closing date' });
+            }
+        }
+        if (t.closingDate === tomorrowStr) {
             dueTomorrow.push({ tender: t, dateStr: t.closingDate, type: 'Closing date' });
         }
     });
@@ -5378,17 +6132,441 @@ function showDeadlineBanner(items) {
     setTimeout(() => { const b = document.getElementById('deadlineBanner'); if (b) b.remove(); }, 15000);
 }
 
+// ==================== PIPELINE FUNNEL ====================
+
+function renderPipelineFunnel() {
+    const el = document.getElementById('pipelineFunnel');
+    if (!el) return;
+    const stateTenders = database.tenders.filter(t => t.state === currentState);
+    const total = stateTenders.length || 1;
+
+    const stages = [
+        { key: 'POTENTIAL_UNCONFIRMED', label: 'Potential',   color: '#7c3aed', bg: '#f5f3ff' },
+        { key: 'TO_PRICE',             label: 'To Price',     color: '#2563eb', bg: '#eff6ff' },
+        { key: 'PRICED',               label: 'Priced',       color: '#059669', bg: '#f0fdf4' },
+        { key: 'AWARDED',              label: 'Awarded',      color: '#d97706', bg: '#fffbeb' },
+        { key: 'NOT_WON',              label: 'Not Won',      color: '#dc2626', bg: '#fef2f2' },
+    ];
+
+    el.innerHTML = stages.map(s => {
+        const count = stateTenders.filter(t => t.status === s.key).length;
+        const pct   = Math.round((count / total) * 100);
+        const val   = stateTenders.filter(t => t.status === s.key)
+                        .reduce((sum, t) => sum + (parseFloat((t.awardedValue || t.estimatedValue || '0').replace(/[^0-9.]/g,'')) || 0), 0);
+        return `
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="filterTendersByStatus('${s.key}')">
+            <div class="w-24 text-right text-xs font-semibold" style="color:${s.color}">${s.label}</div>
+            <div class="flex-1 relative h-7 rounded-lg overflow-hidden" style="background:${s.bg}">
+                <div class="pipeline-bar h-full rounded-lg flex items-center justify-end pr-2"
+                     style="width:${Math.max(pct,3)}%; background:${s.color}; transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);">
+                </div>
+                <span class="absolute inset-0 flex items-center px-3 text-xs font-bold" style="color:${s.color}; mix-blend-mode: multiply;">${count} tender${count !== 1 ? 's' : ''}${val > 0 ? ' · ' + formatCurrency(val) : ''}</span>
+            </div>
+            <div class="w-10 text-xs text-gray-400 font-medium text-right">${pct}%</div>
+        </div>`;
+    }).join('');
+}
+
+// ==================== DUE THIS WEEK ====================
+
+function renderDueThisWeek() {
+    const el = document.getElementById('dueThisWeekList');
+    const countEl = document.getElementById('dueThisWeekCount');
+    if (!el) return;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const in7   = new Date(today); in7.setDate(in7.getDate() + 7);
+
+    const items = [];
+    database.tenders.filter(t => t.state === currentState).forEach(t => {
+        const fus = t.followUps?.length ? t.followUps : (t.followUpDate ? [{ description: t.title, date: t.followUpDate, assignees: t.assignedTo ? [t.assignedTo] : [] }] : []);
+        fus.forEach(fu => {
+            if (!fu.date) return;
+            const d = new Date(fu.date); d.setHours(0,0,0,0);
+            if (d <= in7) {
+                const isOverdue = d < today;
+                const isToday   = d.getTime() === today.getTime();
+                items.push({ tender: t, fu, date: d, isOverdue, isToday });
+            }
+        });
+        // submission deadline
+        if (t.submissionDate) {
+            const d = new Date(t.submissionDate); d.setHours(0,0,0,0);
+            if (d >= today && d <= in7) {
+                items.push({ tender: t, fu: { description: 'Submission deadline', date: t.submissionDate }, date: d, isOverdue: false, isToday: d.getTime() === today.getTime(), isDeadline: true });
+            }
+        }
+    });
+
+    items.sort((a, b) => a.date - b.date);
+    if (countEl) countEl.textContent = items.length || '0';
+
+    if (!items.length) {
+        el.innerHTML = `<div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-check-circle text-green-400 text-2xl mb-2 block"></i>All clear this week!</div>`;
+        return;
+    }
+
+    el.innerHTML = items.map(({ tender, fu, isOverdue, isToday, isDeadline }) => {
+        const cls = isOverdue ? 'overdue' : isToday ? 'due-today' : 'due-soon';
+        const label = isOverdue ? 'Overdue' : isToday ? 'Today' : formatDate(fu.date);
+        const icon  = isDeadline ? 'fa-clock' : 'fa-bell';
+        return `
+        <div class="due-item ${cls} p-2.5 cursor-pointer" onclick="editTender('${tender.id}')">
+            <div class="flex items-start gap-2">
+                <i class="fas ${icon} text-xs mt-0.5 flex-shrink-0 ${isOverdue ? 'text-red-500' : isToday ? 'text-amber-500' : 'text-blue-500'}"></i>
+                <div class="min-w-0">
+                    <div class="text-xs font-semibold text-gray-900 truncate">${tender.title}</div>
+                    <div class="text-xs text-gray-500 truncate">${fu.description || ''}</div>
+                    <div class="text-xs font-bold mt-0.5 ${isOverdue ? 'text-red-600' : isToday ? 'text-amber-600' : 'text-blue-600'}">${label}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ==================== TENDER VIEW TOGGLE ====================
+
+let currentTenderView = 'grid';
+
+function setTenderView(view) {
+    currentTenderView = view;
+    ['grid','kanban','list'].forEach(v => {
+        const btn = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
+        if (btn) btn.classList.toggle('active', v === view);
+    });
+    const regionContent = document.getElementById('regionContent');
+    const kanbanContent = document.getElementById('kanbanContent');
+    if (view === 'kanban') {
+        regionContent.classList.add('hidden');
+        kanbanContent.classList.remove('hidden');
+        renderKanbanBoard();
+    } else {
+        regionContent.classList.remove('hidden');
+        kanbanContent.classList.add('hidden');
+        if (view === 'list') regionContent.classList.add('list-view');
+        else regionContent.classList.remove('list-view');
+        if (currentStatusFilter) filterTendersByStatus(currentStatusFilter);
+        else loadRegion(currentRegion);
+    }
+}
+
+function renderKanbanBoard() {
+    const board = document.getElementById('kanbanBoard');
+    if (!board) return;
+    const stateTenders = database.tenders.filter(t => t.state === currentState);
+    const cols = [
+        { key: 'POTENTIAL_UNCONFIRMED', label: 'Potential',   color: '#7c3aed', bg: '#ede9fe' },
+        { key: 'TO_PRICE',             label: 'To Price',     color: '#2563eb', bg: '#dbeafe' },
+        { key: 'PRICED',               label: 'Priced',       color: '#059669', bg: '#d1fae5' },
+        { key: 'NOT_PRICING',          label: 'Not Pricing',  color: '#6b7280', bg: '#f3f4f6' },
+        { key: 'AWARDED',              label: 'Awarded',      color: '#d97706', bg: '#fef3c7' },
+        { key: 'NOT_WON',              label: 'Not Won',      color: '#dc2626', bg: '#fee2e2' },
+    ];
+    board.innerHTML = cols.map(col => {
+        const cards = stateTenders.filter(t => t.status === col.key);
+        return `
+        <div class="kanban-col" style="min-height:400px; width:260px;">
+            <div class="kanban-col-header flex items-center justify-between" style="background:${col.bg}; color:${col.color};">
+                <span>${col.label}</span>
+                <span class="font-bold">${cards.length}</span>
+            </div>
+            <div class="p-1 space-y-1 overflow-y-auto" style="max-height:65vh;">
+                ${cards.length ? cards.map(t => `
+                    <div class="kanban-card" onclick="editTender('${t.id}')">
+                        <div class="text-xs font-bold text-gray-800 leading-tight mb-1">${t.title}</div>
+                        <div class="text-xs text-gray-500 mb-1.5">${t.regionName || t.regionId || ''}</div>
+                        ${t.awardedValue ? `<div class="text-xs font-semibold text-green-700">${t.awardedValue}</div>` : ''}
+                        ${t.submissionDate ? `<div class="text-xs text-gray-400 mt-1"><i class="fas fa-clock mr-1"></i>${formatDate(t.submissionDate)}</div>` : ''}
+                        ${(t.followUps?.length || t.followUpDate) ? `<div class="text-xs text-amber-600 mt-1"><i class="fas fa-bell mr-1"></i>${t.followUps?.length || 1} follow-up</div>` : ''}
+                    </div>`).join('') : `<div class="text-xs text-gray-400 text-center py-8 italic">None</div>`}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ==================== BULK MODE ====================
+
+let bulkMode = false;
+let bulkSelected = new Set();
+
+function toggleBulkMode() {
+    bulkMode = !bulkMode;
+    const btn = document.getElementById('bulkModeBtn');
+    if (btn) {
+        btn.classList.toggle('bg-red-100', bulkMode);
+        btn.classList.toggle('text-red-700', bulkMode);
+        btn.title = bulkMode ? 'Exit bulk mode' : 'Bulk select tenders';
+    }
+    document.body.classList.toggle('bulk-mode', bulkMode);
+    if (!bulkMode) clearBulkSelection();
+    // Re-render to show/hide checkboxes
+    if (currentTenderView === 'grid') {
+        if (currentStatusFilter) filterTendersByStatus(currentStatusFilter);
+        else loadRegion(currentRegion);
+    }
+    if (bulkMode) showToast('Bulk mode: click tenders to select', 'info');
+}
+
+function toggleBulkSelect(id, el) {
+    if (!bulkMode) return;
+    if (bulkSelected.has(id)) {
+        bulkSelected.delete(id);
+        el.closest('.region-card, [data-tender-id]')?.classList.remove('ring-2','ring-red-500');
+        el.checked = false;
+    } else {
+        bulkSelected.add(id);
+        el.closest('.region-card, [data-tender-id]')?.classList.add('ring-2','ring-red-500');
+        el.checked = true;
+    }
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const bar = document.getElementById('bulkBar');
+    const count = document.getElementById('bulkCount');
+    if (!bar || !count) return;
+    count.textContent = bulkSelected.size;
+    bar.classList.toggle('show', bulkSelected.size > 0);
+}
+
+function clearBulkSelection() {
+    bulkSelected.clear();
+    document.querySelectorAll('.bulk-select-cb').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.ring-red-500').forEach(el => el.classList.remove('ring-2','ring-red-500'));
+    updateBulkBar();
+}
+
+async function bulkChangeStatus(newStatus) {
+    if (!bulkSelected.size) return;
+    const ids = [...bulkSelected];
+    const label = newStatus.replace(/_/g, ' ').toLowerCase();
+    if (!confirm(`Change ${ids.length} tender(s) to "${label}"?`)) return;
+
+    updateSyncStatus('Saving...');
+    for (const id of ids) {
+        const t = database.tenders.find(x => x.id === id);
+        if (!t) continue;
+        t.status = newStatus;
+        if (!isDemoMode && currentUser) {
+            try { await db.collection('tenders').doc(String(id)).update({ status: newStatus }); } catch(e) {}
+        }
+    }
+    if (isDemoMode) saveDemoData();
+    updateAllStats();
+    clearBulkSelection();
+    bulkMode = false;
+    document.body.classList.remove('bulk-mode');
+    if (currentTenderView === 'grid') loadRegion(currentRegion);
+    updateSyncStatus(isDemoMode ? 'Demo Mode' : 'Synced');
+    showToast(`${ids.length} tender(s) updated to ${label}`, 'success');
+}
+
+// ==================== DARK MODE ====================
+
+function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark-mode');
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const icon = document.getElementById('darkModeIcon');
+    if (icon) {
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    try { localStorage.setItem('crm_dark_mode', isDark ? '1' : '0'); } catch(e) {}
+}
+
+function initDarkMode() {
+    try {
+        if (localStorage.getItem('crm_dark_mode') === '1') {
+            document.documentElement.classList.add('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = 'fas fa-sun';
+        }
+    } catch(e) {}
+}
+
+// ==================== QUICK STATS BAR ====================
+
+function updateQuickStatsBar() {
+    const bar = document.getElementById('quickStatsBar');
+    if (!bar) return;
+    const st = database.tenders.filter(t => t.state === currentState);
+    const overdue = (() => {
+        const today = new Date(); today.setHours(0,0,0,0);
+        let n = 0;
+        st.forEach(t => {
+            const fus = t.followUps?.length ? t.followUps : (t.followUpDate ? [{ date: t.followUpDate }] : []);
+            fus.forEach(fu => { if (fu.date && new Date(fu.date) < today) n++; });
+        });
+        return n;
+    })();
+    bar.innerHTML = `
+        <span class="quick-stat"><i class="fas fa-file-contract mr-1 text-blue-500"></i>${st.length} tenders</span>
+        ${overdue > 0 ? `<span class="quick-stat text-red-600 border-red-200"><i class="fas fa-exclamation-circle mr-1"></i>${overdue} overdue</span>` : ''}
+        <span class="quick-stat"><i class="fas fa-trophy mr-1 text-yellow-500"></i>${st.filter(t=>t.status==='AWARDED').length} awarded</span>
+    `;
+}
+
+// ==================== LINKED CRM CONTACTS IN TENDER ====================
+
+let tenderLinkedContacts = [];
+
+function searchContactsForTender(query) {
+    const dd = document.getElementById('tenderContactDropdown');
+    if (!dd) return;
+    if (!query.trim()) { dd.classList.add('hidden'); return; }
+    const q = query.toLowerCase();
+    const matches = (database.crmContacts || [])
+        .filter(c => c.state === currentState && !tenderLinkedContacts.includes(c.id))
+        .filter(c => (c.name||'').toLowerCase().includes(q) || (c.position||'').toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q))
+        .slice(0, 8);
+    if (!matches.length) {
+        dd.innerHTML = '<div class="px-4 py-3 text-xs text-gray-400 italic">No contacts found</div>';
+    } else {
+        dd.innerHTML = matches.map(c => `
+            <div class="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
+                 onmousedown="linkContactToTender('${c.id}')">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                     style="background: ${categoryColour(c.category)}">
+                    ${(c.name||'?')[0].toUpperCase()}
+                </div>
+                <div>
+                    <div class="font-medium text-gray-900">${c.name}</div>
+                    <div class="text-xs text-gray-500">${c.position || ''} · ${c.type || ''}</div>
+                </div>
+            </div>`).join('');
+    }
+    dd.classList.remove('hidden');
+}
+
+function categoryColour(cat) {
+    return { Council:'#3b82f6', Supplier:'#10b981', Contractor:'#f59e0b', Competitor:'#ef4444' }[cat] || '#9ca3af';
+}
+
+function showTenderContactDropdown() {
+    const dd = document.getElementById('tenderContactDropdown');
+    if (dd && dd.innerHTML.trim()) dd.classList.remove('hidden');
+}
+function hideTenderContactDropdown() {
+    const dd = document.getElementById('tenderContactDropdown');
+    if (dd) dd.classList.add('hidden');
+}
+
+function linkContactToTender(contactId) {
+    if (!tenderLinkedContacts.includes(contactId)) {
+        tenderLinkedContacts.push(contactId);
+        renderTenderLinkedContactsPills();
+    }
+    const inp = document.getElementById('tenderContactSearch');
+    if (inp) inp.value = '';
+    hideTenderContactDropdown();
+}
+
+function unlinkContactFromTender(contactId) {
+    tenderLinkedContacts = tenderLinkedContacts.filter(id => id !== contactId);
+    renderTenderLinkedContactsPills();
+}
+
+function renderTenderLinkedContactsPills() {
+    const container = document.getElementById('tenderLinkedContactsPills');
+    if (!container) return;
+    if (!tenderLinkedContacts.length) {
+        container.innerHTML = '<span class="text-xs text-gray-400 italic">No contacts linked yet</span>';
+        return;
+    }
+    container.innerHTML = tenderLinkedContacts.map(id => {
+        const c = (database.crmContacts || []).find(x => x.id === id);
+        if (!c) return '';
+        return `<span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full text-white" style="background:${categoryColour(c.category)}">
+            ${c.name}
+            <button type="button" onclick="unlinkContactFromTender('${id}')" class="ml-1 opacity-70 hover:opacity-100 text-xs leading-none">&times;</button>
+        </span>`;
+    }).join('');
+}
+
+// ==================== ACTIVITY LOG / TIMESTAMP ====================
+
+function logActivity(action, entity, name) {
+    try {
+        const log = JSON.parse(sessionStorage.getItem('crm_activity') || '[]');
+        log.unshift({ action, entity, name, time: new Date().toISOString(), user: currentUser?.email || 'demo' });
+        sessionStorage.setItem('crm_activity', JSON.stringify(log.slice(0, 50)));
+    } catch(e) {}
+}
+
+function renderActivityFeed() {
+    const el = document.getElementById('activityFeed');
+    if (!el) return;
+    try {
+        const log = JSON.parse(sessionStorage.getItem('crm_activity') || '[]');
+        if (!log.length) { el.innerHTML = '<div class="text-xs text-gray-400 py-4 text-center">No recent activity</div>'; return; }
+        el.innerHTML = log.slice(0, 15).map(item => {
+            const icons = { save:'fa-save text-blue-500', delete:'fa-trash text-red-500', status:'fa-arrow-right text-green-500', add:'fa-plus text-purple-500' };
+            const icon = icons[item.action] || 'fa-circle text-gray-400';
+            const ago = timeAgo(new Date(item.time));
+            return `<div class="activity-item">
+                <span class="activity-dot" style="background:${item.entity==='tender'?'#3b82f6':'#10b981'}"></span>
+                <div class="text-xs text-gray-600 flex-1 min-w-0">
+                    <span class="font-medium text-gray-900 truncate block">${item.name}</span>
+                    <span class="text-gray-400">${item.action} · ${ago}</span>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) {}
+}
+
+function timeAgo(date) {
+    const secs = Math.round((Date.now() - date) / 1000);
+    if (secs < 60)  return 'just now';
+    if (secs < 3600) return Math.floor(secs/60) + 'm ago';
+    if (secs < 86400) return Math.floor(secs/3600) + 'h ago';
+    return Math.floor(secs/86400) + 'd ago';
+}
+
+// ==================== KEYBOARD SHORTCUTS ====================
+
+document.addEventListener('keydown', function(e) {
+    // Skip if user is typing in an input/textarea
+    if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+    // Skip if modal is open
+    if (!document.getElementById('tenderModal')?.classList.contains('hidden') ||
+        !document.getElementById('crmModal')?.classList.contains('hidden')) return;
+
+    switch(e.key) {
+        case 'n': case 'N':
+            if (currentMainTab === 'tenders') { e.preventDefault(); showAddTenderModal(null); }
+            else if (currentMainTab === 'crm') { e.preventDefault(); showAddCRMModal(); }
+            break;
+        case 'k': case 'K':
+            if (currentMainTab === 'tenders') { e.preventDefault(); setTenderView(currentTenderView === 'kanban' ? 'grid' : 'kanban'); }
+            break;
+        case 'b': case 'B':
+            if (currentMainTab === 'tenders') { e.preventDefault(); toggleBulkMode(); }
+            break;
+        case 'Escape':
+            clearBulkSelection();
+            if (bulkMode) toggleBulkMode();
+            break;
+        case '/':
+            e.preventDefault();
+            document.getElementById('globalSearch')?.focus();
+            break;
+        case '1': switchMainTab('tenders'); break;
+        case '2': switchMainTab('crm'); break;
+        case '3': switchMainTab('analytics'); break;
+        case '4': switchMainTab('myactions'); break;
+    }
+});
+
 // ==================== INITIALIZATION ====================
 
 document.addEventListener('DOMContentLoaded', function() {
+    initDarkMode();
+
     // Close modals on outside click
     window.onclick = function(event) {
         const modals = ['tenderModal', 'crmModal', 'interactionModal', 'adminPanel', 'feedbackModal'];
         modals.forEach(modalId => {
             const modal = document.getElementById(modalId);
-            if (event.target === modal) {
-                modal.classList.add('hidden');
-            }
+            if (event.target === modal) modal.classList.add('hidden');
         });
     };
 });
