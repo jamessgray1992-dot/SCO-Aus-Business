@@ -4010,9 +4010,32 @@ let _approvedUserEmails = []; // cache for follow-up dropdowns
 async function populateFollowUpAssignedDropdowns() {
     try {
         const snap = await db.collection('approvedUsers').where('approved','==',true).get();
-        _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean);
-    } catch(e) { _approvedUserEmails = []; }
+        _approvedUserEmails = snap.docs.map(d => d.data().email).filter(Boolean).sort();
+        console.log('Loaded', _approvedUserEmails.length, 'approved users for assignment');
+    } catch(e) { 
+        console.warn('Could not load approved users:', e);
+        _approvedUserEmails = []; 
+    }
     renderFollowUpsList();
+}
+
+// Function to add a new assignee to a follow-up
+function addAssigneeToFollowUp(followUpId, email) {
+    const fu = tenderFollowUps.find(f => f.id === followUpId);
+    if (fu && email && !fu.assignees.includes(email)) {
+        fu.assignees.push(email);
+        renderFollowUpsList();
+        showToast('Assigned to ' + email.split('@')[0], 'success');
+    }
+}
+
+// Function to remove an assignee from a follow-up
+function removeAssigneeFromFollowUp(followUpId, email) {
+    const fu = tenderFollowUps.find(f => f.id === followUpId);
+    if (fu) {
+        fu.assignees = fu.assignees.filter(a => a !== email);
+        renderFollowUpsList();
+    }
 }
 
 function addFollowUpRow() {
@@ -4034,40 +4057,52 @@ function renderFollowUpsList() {
     const container = document.getElementById('followUpsList');
     if (!container) return;
     if (tenderFollowUps.length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-400 italic text-center py-3">No follow-ups added yet. Click "Add Follow-up" to create one.</p>';
+        container.innerHTML = '<div class="text-center py-6"><p class="text-sm text-gray-400 italic">No follow-ups added yet.</p><p class="text-xs text-gray-400 mt-1">Click "Add Follow-up" to create actions and assign them to team members.</p></div>';
         return;
     }
     container.innerHTML = tenderFollowUps.map((fu, idx) => {
-        const assigneeOptions = _approvedUserEmails.map(email =>
-            `<option value="${email}" ${fu.assignees.includes(email) ? 'selected' : ''}>${email}</option>`
+        // Filter out already assigned users from dropdown
+        const availableUsers = _approvedUserEmails.filter(email => !fu.assignees.includes(email));
+        const assigneeOptions = availableUsers.map(email =>
+            `<option value="${email}">${email}</option>`
         ).join('');
         const assigneePills = fu.assignees.map(email =>
-            `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs rounded-full font-medium">${email}<button type="button" onclick="removeFollowUpAssignee(${fu.id},'${email}')" class="hover:text-red-600 font-bold">&times;</button></span>`
+            `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full font-medium hover:bg-indigo-200 transition-colors">
+                <i class="fas fa-user-circle text-indigo-500"></i>
+                ${email.split('@')[0]}
+                <button type="button" onclick="event.stopPropagation(); removeFollowUpAssignee(${fu.id},'${email}')" class="hover:text-red-600 font-bold ml-1" title="Remove assignee">&times;</button>
+            </span>`
         ).join('');
-        return `<div class="bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-3" data-fuid="${fu.id}">
+        return `<div class="bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-3 hover:border-indigo-300 transition-colors" data-fuid="${fu.id}">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Follow-up #${idx + 1}</span>
-                <button type="button" onclick="removeFollowUpRow(${fu.id})" class="text-red-400 hover:text-red-600 text-sm"><i class="fas fa-times"></i></button>
+                <span class="text-xs font-semibold text-indigo-700 uppercase tracking-wide flex items-center gap-2">
+                    <i class="fas fa-tasks"></i> Action #${idx + 1}
+                </span>
+                <button type="button" onclick="removeFollowUpRow(${fu.id})" class="text-red-400 hover:text-red-600 text-sm p-1 hover:bg-red-50 rounded transition-colors" title="Remove action">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="col-span-2 md:col-span-1">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Description / Action</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Description / Action *</label>
                     <input type="text" value="${fu.description || ''}" placeholder="e.g., Call council to confirm scope" 
                         oninput="updateFollowUpField(${fu.id},'description',this.value)"
                         class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm">
                 </div>
                 <div class="col-span-2 md:col-span-1">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Due Date</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Due Date *</label>
                     <input type="date" value="${fu.date || ''}"
                         oninput="updateFollowUpField(${fu.id},'date',this.value)"
                         class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm">
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Assigned People</label>
-                    <div class="flex flex-wrap gap-1.5 mb-2 min-h-[24px]">${assigneePills || '<span class="text-xs text-gray-400 italic">No one assigned yet</span>'}</div>
-                    <select onchange="addFollowUpAssignee(${fu.id},this)" class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm bg-white">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">
+                        <i class="fas fa-users mr-1"></i> Assigned To (${fu.assignees.length})
+                    </label>
+                    <div class="flex flex-wrap gap-1.5 mb-2 min-h-[28px] p-2 bg-white rounded-lg border border-gray-200">${assigneePills || '<span class="text-xs text-gray-400 italic">No one assigned yet - select from dropdown</span>'}</div>
+                    <select onchange="addFollowUpAssignee(${fu.id},this.value); this.value='';" class="w-full rounded-lg px-3 py-2 border-2 border-gray-200 focus:border-indigo-400 focus:outline-none text-sm bg-white">
                         <option value="">+ Assign someone...</option>
-                        ${assigneeOptions}
+                        ${assigneeOptions || '<option value="" disabled>No more users available</option>'}
                     </select>
                 </div>
             </div>
@@ -6568,18 +6603,41 @@ async function submitAccessRequest() {
     const password = (document.getElementById('reqPassword').value || '').trim();
     const reason   = (document.getElementById('reqReason').value   || '').trim();
 
-    if (!name)           { showToast('Please enter your name', 'error');  return; }
-    if (!email)          { showToast('Please enter your email', 'error'); return; }
-    if (password.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+    // Validation with visual feedback
+    if (!name) { 
+        showFieldError('reqName', 'Please enter your name');
+        return; 
+    }
+    if (!email) { 
+        showFieldError('reqEmail', 'Please enter your email'); 
+        return; 
+    }
+    if (!isValidEmail(email)) {
+        showFieldError('reqEmail', 'Please enter a valid email address');
+        return;
+    }
+    if (password.length < 8) { 
+        showFieldError('reqPassword', 'Password must be at least 8 characters'); 
+        return; 
+    }
+
+    // Show loading state
+    const btn = document.querySelector('#requestAccessModal button[onclick="submitAccessRequest()"]');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+        btn.disabled = true;
+    }
 
     try {
-        // Check for duplicate pending request (single-field query to avoid needing composite index)
+        // Check for duplicate pending request
         const existing = await db.collection('accessRequests')
             .where('email', '==', email)
             .get();
         const hasPending = existing.docs.some(d => d.data().status === 'pending');
         if (hasPending) {
             showToast('A request for this email is already pending', 'error');
+            if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
             return;
         }
 
@@ -6596,12 +6654,37 @@ async function submitAccessRequest() {
 
         showToast('Request submitted! Admin will review and contact you.', 'success');
         hideRequestAccessModal();
+
+        // Clear form
         document.getElementById('reqName').value = '';
         document.getElementById('reqEmail').value = '';
         document.getElementById('reqPassword').value = '';
         document.getElementById('reqReason').value = '';
+
     } catch(e) {
+        console.error('Access request error:', e);
         showToast('Error submitting request: ' + e.message, 'error');
+    } finally {
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    }
+}
+
+// Helper function for email validation
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Helper function to show field errors
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        field.classList.add('border-red-500');
+        field.classList.remove('border-gray-200');
+        showToast(message, 'error');
+        field.addEventListener('input', function() {
+            this.classList.remove('border-red-500');
+            this.classList.add('border-gray-200');
+        }, { once: true });
     }
 }
 
@@ -7148,27 +7231,45 @@ let tenderLinkedContacts = [];
 
 function searchContactsForTender(query) {
     const dd = document.getElementById('tenderContactDropdown');
+    const input = document.getElementById('tenderContactSearch');
     if (!dd) return;
-    if (!query.trim()) { dd.classList.add('hidden'); return; }
+    if (!query.trim()) { 
+        // Show all available contacts when input is focused but empty
+        const allContacts = (database.crmContacts || [])
+            .filter(c => c.state === currentState && !tenderLinkedContacts.includes(String(c.id)) && !tenderLinkedContacts.includes(Number(c.id)))
+            .slice(0, 8);
+        if (allContacts.length > 0) {
+            renderContactDropdown(allContacts, dd);
+            dd.classList.remove('hidden');
+        } else {
+            dd.classList.add('hidden');
+        }
+        return; 
+    }
     const q = query.toLowerCase();
     const matches = (database.crmContacts || [])
-        .filter(c => c.state === currentState && !tenderLinkedContacts.includes(c.id))
-        .filter(c => (c.name||'').toLowerCase().includes(q) || (c.position||'').toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q))
+        .filter(c => c.state === currentState && !tenderLinkedContacts.includes(String(c.id)) && !tenderLinkedContacts.includes(Number(c.id)))
+        .filter(c => (c.name||'').toLowerCase().includes(q) || (c.position||'').toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q) || (c.department||'').toLowerCase().includes(q))
         .slice(0, 8);
-    if (!matches.length) {
+    renderContactDropdown(matches, dd);
+}
+
+function renderContactDropdown(contacts, dd) {
+    if (!contacts.length) {
         dd.innerHTML = '<div class="px-4 py-3 text-xs text-gray-400 italic">No contacts found</div>';
     } else {
-        dd.innerHTML = matches.map(c => `
-            <div class="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm"
-                 onmousedown="linkContactToTender('${c.id}')">
-                <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+        dd.innerHTML = contacts.map(c => `
+            <div class="flex items-center gap-2 px-4 py-2 hover:bg-green-50 cursor-pointer text-sm transition-colors"
+                 onmousedown="event.preventDefault(); linkContactToTender('${c.id}')">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm"
                      style="background: ${categoryColour(c.category)}">
                     ${(c.name||'?')[0].toUpperCase()}
                 </div>
-                <div>
-                    <div class="font-medium text-gray-900">${c.name}</div>
-                    <div class="text-xs text-gray-500">${c.position || ''} · ${c.type || ''}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-900 truncate">${c.name}</div>
+                    <div class="text-xs text-gray-500 truncate">${c.position || ''} · ${c.type || ''} · ${c.department || ''}</div>
                 </div>
+                <i class="fas fa-plus-circle text-green-500 text-sm"></i>
             </div>`).join('');
     }
     dd.classList.remove('hidden');
@@ -7188,33 +7289,42 @@ function hideTenderContactDropdown() {
 }
 
 function linkContactToTender(contactId) {
-    if (!tenderLinkedContacts.includes(contactId)) {
-        tenderLinkedContacts.push(contactId);
+    const id = String(contactId);
+    if (!tenderLinkedContacts.includes(id)) {
+        tenderLinkedContacts.push(id);
         renderTenderLinkedContactsPills();
+        showToast('Contact linked to tender', 'success');
     }
     const inp = document.getElementById('tenderContactSearch');
-    if (inp) inp.value = '';
-    hideTenderContactDropdown();
+    if (inp) {
+        inp.value = '';
+        inp.focus();
+    }
+    // Refresh dropdown to show remaining contacts
+    searchContactsForTender('');
 }
 
 function unlinkContactFromTender(contactId) {
-    tenderLinkedContacts = tenderLinkedContacts.filter(id => id !== contactId);
+    const id = String(contactId);
+    tenderLinkedContacts = tenderLinkedContacts.filter(cid => String(cid) !== id);
     renderTenderLinkedContactsPills();
+    showToast('Contact unlinked', 'info');
 }
 
 function renderTenderLinkedContactsPills() {
     const container = document.getElementById('tenderLinkedContactsPills');
     if (!container) return;
     if (!tenderLinkedContacts.length) {
-        container.innerHTML = '<span class="text-xs text-gray-400 italic">No contacts linked yet</span>';
+        container.innerHTML = '<span class="text-xs text-gray-400 italic">No contacts linked yet. Search above to add contacts.</span>';
         return;
     }
     container.innerHTML = tenderLinkedContacts.map(id => {
-        const c = (database.crmContacts || []).find(x => x.id === id);
+        const c = (database.crmContacts || []).find(x => String(x.id) === String(id));
         if (!c) return '';
-        return `<span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full text-white" style="background:${categoryColour(c.category)}">
+        return `<span class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full text-white shadow-sm hover:shadow-md transition-shadow" style="background:${categoryColour(c.category)}">
+            <i class="fas fa-user text-xs opacity-70"></i>
             ${c.name}
-            <button type="button" onclick="unlinkContactFromTender('${id}')" class="ml-1 opacity-70 hover:opacity-100 text-xs leading-none">&times;</button>
+            <button type="button" onclick="event.stopPropagation(); unlinkContactFromTender('${id}')" class="ml-1 opacity-70 hover:opacity-100 text-xs leading-none hover:bg-white hover:bg-opacity-20 rounded-full w-4 h-4 flex items-center justify-center transition-all">&times;</button>
         </span>`;
     }).join('');
 }
