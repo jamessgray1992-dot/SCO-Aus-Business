@@ -759,6 +759,7 @@
         .custom-field-row { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body class="text-gray-800 min-h-screen">
 
@@ -818,24 +819,41 @@
                         <button onclick="hideRequestAccessModal()" class="text-gray-400 hover:text-gray-600 mr-3"><i class="fas fa-arrow-left"></i></button>
                         <h3 class="font-bold text-gray-900">Request Account Access</h3>
                     </div>
-                    <div class="space-y-3">
+                    
+                    <!-- Success Message (hidden by default) -->
+                    <div id="requestSuccessMessage" class="hidden bg-green-50 border border-green-200 rounded-xl p-6 text-center mb-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                        </div>
+                        <h4 class="font-bold text-green-800 text-lg mb-2">Request Submitted!</h4>
+                        <p class="text-green-700 text-sm mb-1">Your access request has been sent to the admin.</p>
+                        <p class="text-green-600 text-xs">You will receive an email once your request is approved.</p>
+                    </div>
+                    
+                    <!-- Error Message (hidden by default) -->
+                    <div id="requestErrorMessage" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 text-center mb-4">
+                        <i class="fas fa-exclamation-circle text-red-500 text-xl mb-2"></i>
+                        <p class="text-red-700 text-sm" id="requestErrorText">Something went wrong. Please try again.</p>
+                    </div>
+                    
+                    <div id="requestFormContainer" class="space-y-3">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Full Name *</label>
-                            <input type="text" id="reqName" placeholder="Your name" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none">
+                            <input type="text" id="reqName" placeholder="Your name" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Work Email *</label>
-                            <input type="email" id="reqEmail" placeholder="you@company.com" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none">
+                            <input type="email" id="reqEmail" placeholder="you@company.com" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Requested Password *</label>
-                            <input type="password" id="reqPassword" placeholder="Min 8 characters" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none">
+                            <input type="password" id="reqPassword" placeholder="Min 8 characters" class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Reason for Access</label>
-                            <textarea id="reqReason" rows="2" placeholder="Brief reason..." class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none resize-none"></textarea>
+                            <textarea id="reqReason" rows="2" placeholder="Brief reason..." class="w-full px-3 py-2 text-sm rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none resize-none transition-colors"></textarea>
                         </div>
-                        <button onclick="submitAccessRequest()" class="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm">
+                        <button id="submitRequestBtn" onclick="submitAccessRequest()" class="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm">
                             <i class="fas fa-paper-plane mr-2"></i> Submit Request
                         </button>
                         <p class="text-xs text-gray-400 text-center">An admin will review your request and contact you by email.</p>
@@ -2574,6 +2592,9 @@ const firebaseConfig = BRAND.firebase;
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+
+// Check Firestore connection on load
+setTimeout(checkFirestoreConnection, 2000);
 
 // Set auth persistence
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -6595,6 +6616,8 @@ function showRequestAccessModal() {
 function hideRequestAccessModal() {
     document.getElementById('requestAccessModal').classList.add('hidden');
     document.getElementById('authForm').classList.remove('hidden');
+    // Reset form after a short delay
+    setTimeout(resetRequestAccessForm, 300);
 }
 
 async function submitAccessRequest() {
@@ -6602,6 +6625,12 @@ async function submitAccessRequest() {
     const email    = (document.getElementById('reqEmail').value    || '').trim();
     const password = (document.getElementById('reqPassword').value || '').trim();
     const reason   = (document.getElementById('reqReason').value   || '').trim();
+
+    console.log('Submitting access request for:', email);
+
+    // Hide any previous messages
+    document.getElementById('requestSuccessMessage').classList.add('hidden');
+    document.getElementById('requestErrorMessage').classList.add('hidden');
 
     // Validation with visual feedback
     if (!name) { 
@@ -6622,7 +6651,7 @@ async function submitAccessRequest() {
     }
 
     // Show loading state
-    const btn = document.querySelector('#requestAccessModal button[onclick="submitAccessRequest()"]');
+    const btn = document.getElementById('submitRequestBtn');
     const originalText = btn ? btn.innerHTML : '';
     if (btn) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
@@ -6630,42 +6659,96 @@ async function submitAccessRequest() {
     }
 
     try {
-        // Check for duplicate pending request
-        const existing = await db.collection('accessRequests')
-            .where('email', '==', email)
-            .get();
-        const hasPending = existing.docs.some(d => d.data().status === 'pending');
+        console.log('Checking for existing requests...');
+        
+        // Check for duplicate pending request - wrap in try/catch in case collection doesn't exist
+        let hasPending = false;
+        try {
+            const existing = await db.collection('accessRequests')
+                .where('email', '==', email)
+                .get();
+            hasPending = existing.docs.some(d => d.data().status === 'pending');
+        } catch (queryErr) {
+            console.log('Query error (collection may not exist yet):', queryErr.message);
+            // Continue anyway - this is likely the first request
+        }
+        
         if (hasPending) {
             showToast('A request for this email is already pending', 'error');
+            document.getElementById('requestErrorText').textContent = 'A request for this email is already pending approval.';
+            document.getElementById('requestErrorMessage').classList.remove('hidden');
             if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
             return;
         }
 
         const requestData = {
-            name, email, password, reason,
+            name, 
+            email, 
+            password, 
+            reason: reason || 'No reason provided',
             status: 'pending',
-            createdAt: new Date().toISOString()
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAtISO: new Date().toISOString()
         };
 
-        await db.collection('accessRequests').add(requestData);
+        console.log('Saving request to Firestore...', requestData);
+        
+        // Save to Firestore
+        const docRef = await db.collection('accessRequests').add(requestData);
+        console.log('Request saved with ID:', docRef.id);
 
         // Notify admin via EmailJS
+        console.log('Sending admin notification...');
         sendAdminNotificationEmail(name, email, reason);
 
-        showToast('Request submitted! Admin will review and contact you.', 'success');
-        hideRequestAccessModal();
+        // Hide form and show success message
+        document.getElementById('requestFormContainer').classList.add('hidden');
+        document.getElementById('requestSuccessMessage').classList.remove('hidden');
+        
+        // Also show toast notification
+        showToast('Request submitted successfully! Admin will review and contact you.', 'success');
 
-        // Clear form
-        document.getElementById('reqName').value = '';
-        document.getElementById('reqEmail').value = '';
-        document.getElementById('reqPassword').value = '';
-        document.getElementById('reqReason').value = '';
+        // Wait a moment before closing modal so user can see success message
+        setTimeout(() => {
+            hideRequestAccessModal();
+            // Reset everything after modal is hidden
+            setTimeout(() => {
+                resetRequestAccessForm();
+            }, 300);
+        }, 3000);
 
     } catch(e) {
         console.error('Access request error:', e);
         showToast('Error submitting request: ' + e.message, 'error');
-    } finally {
-        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+        
+        // Show error message
+        document.getElementById('requestErrorText').textContent = 'Error: ' + e.message;
+        document.getElementById('requestErrorMessage').classList.remove('hidden');
+        
+        if (btn) { 
+            btn.innerHTML = originalText; 
+            btn.disabled = false; 
+        }
+    }
+}
+
+function resetRequestAccessForm() {
+    // Clear form fields
+    document.getElementById('reqName').value = '';
+    document.getElementById('reqEmail').value = '';
+    document.getElementById('reqPassword').value = '';
+    document.getElementById('reqReason').value = '';
+    
+    // Reset UI
+    document.getElementById('requestFormContainer').classList.remove('hidden');
+    document.getElementById('requestSuccessMessage').classList.add('hidden');
+    document.getElementById('requestErrorMessage').classList.add('hidden');
+    
+    // Reset button
+    const btn = document.getElementById('submitRequestBtn');
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Submit Request';
+        btn.disabled = false;
     }
 }
 
@@ -6690,14 +6773,27 @@ function showFieldError(fieldId, message) {
 
 function sendAdminNotificationEmail(requesterName, requesterEmail, reason) {
     // EmailJS - configure your service/template IDs in the EMAILJS_CONFIG below
-    if (!EMAILJS_CONFIG.serviceId || EMAILJS_CONFIG.serviceId === 'YOUR_SERVICE_ID') return;
+    if (!EMAILJS_CONFIG.serviceId || EMAILJS_CONFIG.serviceId === 'YOUR_SERVICE_ID') {
+        console.log('EmailJS not configured - skipping admin email notification');
+        console.log('To enable email notifications, update EMAILJS_CONFIG with your credentials');
+        return;
+    }
+    
+    console.log('Sending admin notification email to:', EMAILJS_CONFIG.adminEmail);
+    
     emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.adminTemplateId, {
         to_email:        EMAILJS_CONFIG.adminEmail,
         requester_name:  requesterName,
         requester_email: requesterEmail,
         reason:          reason || 'No reason provided',
-        app_name: COMPANY_CONFIG.shortName
-    }).catch(e => console.warn('EmailJS admin notify failed:', e));
+        app_name: COMPANY_CONFIG.shortName,
+        timestamp:       new Date().toLocaleString()
+    }).then(() => {
+        console.log('Admin notification email sent successfully');
+    }).catch(e => {
+        console.warn('EmailJS admin notify failed:', e);
+        showToast('Request saved but email notification failed', 'warning');
+    });
 }
 
 async function loadPendingRequests() {
@@ -6812,6 +6908,33 @@ const EMAILJS_CONFIG = {
 function initEmailJS() {
     if (EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== 'YOUR_EMAILJS_PUBLIC_KEY') {
         emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    }
+}
+
+// Check Firestore connection and log helpful messages
+async function checkFirestoreConnection() {
+    try {
+        // Try to read from accessRequests to check permissions
+        await db.collection('accessRequests').limit(1).get();
+        console.log('✅ Firestore connection: OK - accessRequests collection is accessible');
+    } catch (e) {
+        console.warn('⚠️ Firestore accessRequests check:', e.message);
+        console.log('💡 TIP: If requests fail to save, update your Firestore security rules to allow:');
+        console.log(`
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to create access requests
+    match /accessRequests/{doc} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    // Allow authenticated users to read/write their own data
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}`);
     }
 }
 
