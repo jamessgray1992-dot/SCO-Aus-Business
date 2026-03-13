@@ -2,7 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#771414">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BD CRM">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="BD CRM">
+    <meta name="msapplication-TileColor" content="#771414">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons for PWA -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%23771414' width='180' height='180' rx='36'/%3E%3Ctext x='90' y='115' font-size='90' text-anchor='middle' fill='white' font-family='Arial'%3EBD%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23771414' width='32' height='32' rx='6'/%3E%3Ctext x='16' y='23' font-size='16' text-anchor='middle' fill='white' font-family='Arial'%3EBD%3C/text%3E%3C/svg%3E">
+    
     <title id="pageTitle">Australian Business Development & CRM System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -35,8 +50,9 @@
         companyShort:  'AUS BD',                        // Abbreviated — used in emails, page title
         tagline:       'Business Development & CRM',    // Sub-line under company name on login screen
         logoText:      'BD',                            // 2–3 char initials (shown if no logoUrl)
-        logoUrl:       '',                              // URL to your logo image — leave '' to use text/icon
-        faviconUrl:    '',                              // URL to favicon — leave '' for browser default
+        logoUrl:       '',                              // URL or base64 data URL — leave '' to use text/icon
+        faviconUrl:    '',                              // URL or base64 data URL — leave '' for browser default
+        // To upload a logo: Use the Brand Settings in the Admin Panel
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │  COLOURS  (use https://colorhex.net to find hex codes)          │
@@ -906,7 +922,7 @@
                                     <div class="flex items-center text-xs text-gray-500">
                                         <span id="brandTagline" class="font-medium" style="color: var(--accent)"></span>
                                         <span class="mx-1 text-gray-300">·</span>
-                                        <span id="userEmail"></span>
+                                        <span id="userDisplayName" class="font-semibold text-gray-700">User</span>
                                     </div>
                                 </div>
                                 <i class="fas fa-chevron-down text-gray-400 ml-1 text-xs"></i>
@@ -946,6 +962,11 @@
                         <!-- Bulk select toggle -->
                         <button onclick="toggleBulkMode()" id="bulkModeBtn" title="Bulk select tenders" class="hidden md:flex w-9 h-9 items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors">
                             <i class="fas fa-tasks"></i>
+                        </button>
+
+                        <!-- User Profile Button -->
+                        <button onclick="showUserProfileModal()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-indigo-600 transition-colors" title="My Profile">
+                            <i class="fas fa-user-circle text-lg"></i>
                         </button>
 
                         <button onclick="signOut()" class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors" title="Sign out">
@@ -2169,12 +2190,34 @@
                                             <input id="bc_tagline" type="text" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Logo URL <span class="text-gray-400 font-normal">(leave blank to use initials)</span></label>
-                                            <input id="bc_logoUrl" type="url" placeholder="https://…" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="livePreviewBrand()">
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Logo <span class="text-gray-400 font-normal">(upload image or enter URL)</span></label>
+                                            <div class="flex gap-2">
+                                                <input id="bc_logoUrl" type="hidden">
+                                                <input id="bc_logoFile" type="file" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+                                                <button onclick="document.getElementById('bc_logoFile').click()" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 flex items-center gap-2">
+                                                    <i class="fas fa-upload"></i> Upload
+                                                </button>
+                                                <input id="bc_logoUrlInput" type="url" placeholder="Or enter URL…" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="document.getElementById('bc_logoUrl').value=this.value; livePreviewBrand()">
+                                            </div>
+                                            <div id="logoPreview" class="mt-2 hidden">
+                                                <img id="logoPreviewImg" src="" class="h-12 w-auto rounded-lg border border-gray-200">
+                                                <button onclick="clearLogo()" class="text-xs text-red-600 hover:text-red-800 mt-1"><i class="fas fa-trash"></i> Remove</button>
+                                            </div>
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Favicon URL <span class="text-gray-400 font-normal">(optional)</span></label>
-                                            <input id="bc_faviconUrl" type="url" placeholder="https://…" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                                            <label class="block text-xs font-semibold text-gray-600 mb-1">Favicon <span class="text-gray-400 font-normal">(upload or enter URL)</span></label>
+                                            <div class="flex gap-2">
+                                                <input id="bc_faviconUrl" type="hidden">
+                                                <input id="bc_faviconFile" type="file" accept="image/*" class="hidden" onchange="handleFaviconUpload(this)">
+                                                <button onclick="document.getElementById('bc_faviconFile').click()" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-700 flex items-center gap-2">
+                                                    <i class="fas fa-upload"></i> Upload
+                                                </button>
+                                                <input id="bc_faviconUrlInput" type="url" placeholder="Or enter URL…" class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400" oninput="document.getElementById('bc_faviconUrl').value=this.value">
+                                            </div>
+                                            <div id="faviconPreview" class="mt-2 hidden">
+                                                <img id="faviconPreviewImg" src="" class="h-8 w-auto rounded">
+                                                <button onclick="clearFavicon()" class="text-xs text-red-600 hover:text-red-800 mt-1"><i class="fas fa-trash"></i> Remove</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2454,6 +2497,69 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Modal -->
+        <div id="userProfileModal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+                <!-- Header -->
+                <div class="flex justify-between items-center px-6 py-4 border-b">
+                    <h3 class="text-xl font-bold display-font flex items-center gap-2">
+                        <span class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm" style="background: var(--accent)">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        My Profile
+                    </h3>
+                    <button onclick="closeUserProfileModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="p-6 space-y-4">
+                    <!-- Avatar Display -->
+                    <div class="text-center">
+                        <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-2" style="background: var(--accent)" id="profileAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <p class="text-sm text-gray-500" id="profileEmailDisplay">user@email.com</p>
+                    </div>
+
+                    <!-- Display Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-id-card mr-1 text-gray-400"></i> Display Name
+                        </label>
+                        <input type="text" id="profileDisplayName" placeholder="e.g., James Gray" 
+                               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                               onkeypress="if(event.key==='Enter')saveUserProfile()">
+                        <p class="text-xs text-gray-500 mt-1">This name will be shown throughout the app instead of your email.</p>
+                    </div>
+
+                    <!-- Phone (optional) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-phone mr-1 text-gray-400"></i> Phone Number
+                        </label>
+                        <input type="tel" id="profilePhone" placeholder="Optional" 
+                               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-400">
+                    </div>
+
+                    <!-- Role/Position (read-only) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-briefcase mr-1 text-gray-400"></i> Role
+                        </label>
+                        <input type="text" id="profileRole" readonly
+                               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-gray-50 text-gray-500">
+                    </div>
+
+                    <!-- Save Button -->
+                    <button onclick="saveUserProfile()" class="w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background: var(--accent)">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
                 </div>
             </div>
         </div>
@@ -2750,7 +2856,7 @@ const australianStates = {
             { id: 'FNQ', name: 'Far North QLD' },
             { id: 'GULF', name: 'Gulf Country' }
         ],
-       regions: [
+regions: [
     // SOUTH EAST QUEENSLAND (SEQ)
     { id: 'SEQ-BCC', name: 'Brisbane City Council', zone: 'SEQ', population: 1265000 },
     { id: 'SEQ-GC', name: 'Gold Coast City', zone: 'SEQ', population: 607000 },
@@ -3676,6 +3782,15 @@ function signIn() {
                     setLoginError('Your account is pending approval. Contact your administrator.');
                     return;
                 }
+                
+                // Load user's display name from Firestore
+                const userData = approvedDoc.data();
+                if (userData.displayName) {
+                    currentUser.displayName = userData.displayName;
+                }
+                if (userData.phone) {
+                    currentUser.phone = userData.phone;
+                }
 
                 await launchApp();
 
@@ -3725,8 +3840,11 @@ async function launchApp() {
     await checkAdminStatus();
     await applyTabPermissions();
     await loadDynamicBrandConfig();
+    
+    // Update UI with user's display name
+    updateUserDisplayName();
 
-    showToast('Welcome back!', 'success');
+    showToast('Welcome back, ' + (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User') + '!', 'success');
 }
 
 async function checkUserApproval(user) {
@@ -5086,12 +5204,13 @@ function renderMyActions() {
         if (myItems.length > 0) { badge.textContent = myItems.length; badge.classList.remove('hidden'); }
         else { badge.classList.add('hidden'); }
     }
+    const userDisplayName = currentUser?.displayName || userEmail.split('@')[0];
     if (myTenders.length === 0) {
-        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userEmail + '</strong> will appear here.</p></div>';
+        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userDisplayName + '</strong> will appear here.</p></div>';
         return;
     }
     if (myItems.length === 0) {
-        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userEmail + '</strong> will appear here.</p></div>';
+        container.innerHTML = '<div class="mb-6"><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Tenders assigned to you across all regions.</p></div><div class="text-center py-20 text-gray-400"><i class="fas fa-inbox text-5xl mb-4"></i><p class="text-lg font-medium">No actions assigned to you</p><p class="text-sm mt-1">Follow-ups assigned to <strong>' + userDisplayName + '</strong> will appear here.</p></div>';
         return;
     }
     const overdue = myItems.filter(function(i) { const d = i.sortDate; return d && new Date(d) < today; });
@@ -5125,7 +5244,7 @@ function renderMyActions() {
     }
     container.innerHTML =
         '<div class="mb-6 flex justify-between items-center">' +
-        '<div><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Follow-ups assigned to <strong>' + userEmail + '</strong></p></div>' +
+        '<div><h2 class="text-2xl font-bold display-font text-gray-900 mb-2"><i class="fas fa-tasks mr-2 text-indigo-600"></i> My Actions</h2><p class="text-gray-600">Follow-ups assigned to <strong>' + userDisplayName + '</strong></p></div>' +
         '<div class="flex items-center gap-3">' +
         '<div class="text-sm text-gray-500 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100"><span class="font-bold text-indigo-700 text-lg">' + myItems.length + '</span> total assigned</div>' +
         '<div class="relative group">' +
@@ -5922,6 +6041,86 @@ function closeAdminPanel() {
     document.getElementById('adminPanel').classList.add('hidden');
 }
 
+// ==================== USER PROFILE FUNCTIONS ====================
+
+function showUserProfileModal() {
+    const modal = document.getElementById('userProfileModal');
+    if (!modal) return;
+    
+    // Populate current values
+    document.getElementById('profileEmailDisplay').textContent = currentUser?.email || 'Unknown';
+    document.getElementById('profileDisplayName').value = currentUser?.displayName || '';
+    document.getElementById('profilePhone').value = currentUser?.phone || '';
+    document.getElementById('profileRole').value = currentUser?.isAdmin ? 'Administrator' : 'User';
+    
+    // Update avatar with initials
+    const avatar = document.getElementById('profileAvatar');
+    const displayName = currentUser?.displayName || currentUser?.email || 'U';
+    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    avatar.innerHTML = initials;
+    
+    modal.classList.remove('hidden');
+}
+
+function closeUserProfileModal() {
+    document.getElementById('userProfileModal').classList.add('hidden');
+}
+
+async function saveUserProfile() {
+    const displayName = document.getElementById('profileDisplayName').value.trim();
+    const phone = document.getElementById('profilePhone').value.trim();
+    
+    if (!displayName) {
+        showToast('Please enter a display name', 'error');
+        return;
+    }
+    
+    try {
+        // Update in Firebase Auth
+        await currentUser.updateProfile({ displayName: displayName });
+        
+        // Update in Firestore approvedUsers collection
+        if (currentUser.uid) {
+            await db.collection('approvedUsers').doc(currentUser.uid).update({
+                displayName: displayName,
+                phone: phone,
+                updatedAt: new Date().toISOString()
+            });
+        }
+        
+        // Update local user object
+        currentUser.displayName = displayName;
+        currentUser.phone = phone;
+        
+        // Update UI
+        updateUserDisplayName();
+        
+        showToast('Profile saved successfully!', 'success');
+        closeUserProfileModal();
+    } catch (e) {
+        console.error('Error saving profile:', e);
+        showToast('Error saving profile: ' + e.message, 'error');
+    }
+}
+
+function updateUserDisplayName() {
+    const displayName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
+    const userDisplayEl = document.getElementById('userDisplayName');
+    if (userDisplayEl) {
+        userDisplayEl.textContent = displayName;
+    }
+}
+
+// Helper to get user's display name
+function getUserDisplayName(userOrEmail) {
+    if (!userOrEmail) return 'Unknown';
+    if (typeof userOrEmail === 'object') {
+        return userOrEmail.displayName || userOrEmail.name || userOrEmail.email?.split('@')[0] || 'User';
+    }
+    // It's an email string
+    return userOrEmail.split('@')[0];
+}
+
 async function loadApprovedUsers() {
     try {
         const snapshot = await db.collection('approvedUsers')
@@ -5938,10 +6137,12 @@ async function loadApprovedUsers() {
         container.innerHTML = snapshot.docs.map(doc => {
             const data = doc.data();
             const date = data.approvedAt ? new Date(data.approvedAt).toLocaleDateString('en-AU') : 'Unknown';
+            const displayName = data.displayName || data.name || data.email?.split('@')[0] || 'User';
             return `
             <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
                 <div>
-                    <div class="font-medium text-gray-900">${data.email}</div>
+                    <div class="font-medium text-gray-900">${displayName}</div>
+                    <div class="text-xs text-gray-500">${data.email}</div>
                     <div class="text-xs text-green-700">Approved: ${date}</div>
                 </div>
                 <button onclick="revokeAccess('${doc.id}')" class="text-red-600 hover:text-red-800 text-sm">
@@ -5960,7 +6161,12 @@ async function loadApprovedUsers() {
 }
 
 async function revokeAccess(uid) {
-    if (!confirm('Are you sure you want to revoke this user\'s access?')) {
+    // Get user info first for the confirmation message
+    const userDoc = await db.collection('approvedUsers').doc(uid).get();
+    const userData = userDoc.data();
+    const displayName = userData?.displayName || userData?.name || userData?.email?.split('@')[0] || 'this user';
+    
+    if (!confirm(`Are you sure you want to revoke ${displayName}'s access?`)) {
         return;
     }
 
@@ -5968,7 +6174,7 @@ async function revokeAccess(uid) {
         await db.collection('approvedUsers').doc(uid).update({
             approved: false,
             revokedAt: new Date().toISOString(),
-            revokedBy: currentUser.email
+            revokedBy: currentUser?.displayName || currentUser?.email || 'admin'
         });
 
         showToast('Access revoked', 'success');
@@ -6734,10 +6940,33 @@ async function submitAccessRequest() {
 
     } catch(e) {
         console.error('Access request error:', e);
-        showToast('Error submitting request: ' + e.message, 'error');
         
-        // Show error message
-        document.getElementById('requestErrorText').textContent = 'Error: ' + e.message;
+        // Check if it's a permissions error
+        let errorMessage = e.message;
+        let isPermissionsError = e.message && e.message.toLowerCase().includes('permission');
+        
+        if (isPermissionsError) {
+            errorMessage = 'Missing permissions. Please ask your admin to update Firestore security rules.';
+            console.log('💡 To fix this, add these Firestore rules:');
+            console.log(`
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /accessRequests/{doc} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}`);
+        }
+        
+        showToast('Error: ' + errorMessage, 'error');
+        
+        // Show error message in modal
+        document.getElementById('requestErrorText').textContent = errorMessage;
         document.getElementById('requestErrorMessage').classList.remove('hidden');
         
         if (btn) { 
@@ -6866,11 +7095,12 @@ async function approveAccessRequest(docId) {
 
         // Add to approvedUsers
         await db.collection('approvedUsers').doc(uid).set({
-            email:      data.email,
-            name:       data.name,
-            approved:   true,
-            approvedAt: new Date().toISOString(),
-            approvedBy: currentUser?.email || 'admin'
+            email:       data.email,
+            name:        data.name,
+            displayName: data.name, // Use the name from request as display name
+            approved:    true,
+            approvedAt:  new Date().toISOString(),
+            approvedBy:  currentUser?.displayName || currentUser?.email || 'admin'
         });
 
         // Mark request resolved
@@ -6911,18 +7141,32 @@ async function denyAccessRequest(docId) {
 // ==================== NOTIFICATIONS & REMINDERS ====================
 
 // ---- EmailJS & notification config (update these with your own IDs) ----
+// To set up email notifications:
+// 1. Go to https://www.emailjs.com/ and create a free account
+// 2. Add an Email Service (Gmail, Outlook, etc.)
+// 3. Create an Email Template for admin notifications with these variables:
+//    - {{requester_name}}, {{requester_email}}, {{reason}}, {{app_name}}, {{timestamp}}
+// 4. Get your Public Key from Account → API Keys
+// 5. Update the values below
 const EMAILJS_CONFIG = {
     publicKey:         'YOUR_EMAILJS_PUBLIC_KEY',   // from emailjs.com → Account → API Keys
-    serviceId:         'YOUR_SERVICE_ID',            // EmailJS → Email Services
-    adminTemplateId:   'YOUR_ADMIN_TEMPLATE_ID',     // template for admin new-request notification
-    approvalTemplateId:'YOUR_APPROVAL_TEMPLATE_ID',  // template for user approval notification
-    reminderTemplateId:'YOUR_REMINDER_TEMPLATE_ID',  // template for day-before action reminder
-    adminEmail:        'admin@yourcompany.com'        // where admin notifications go
+    serviceId:         'YOUR_SERVICE_ID',            // EmailJS → Email Services (e.g., 'gmail', 'outlook')
+    adminTemplateId:   'YOUR_ADMIN_TEMPLATE_ID',     // template ID for admin new-request notification
+    approvalTemplateId:'YOUR_APPROVAL_TEMPLATE_ID',  // template ID for user approval notification
+    reminderTemplateId:'YOUR_REMINDER_TEMPLATE_ID',  // template ID for day-before action reminder
+    adminEmail:        'jsgrayprojects@gmail.com'   // where admin notifications go
 };
 
 function initEmailJS() {
     if (EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== 'YOUR_EMAILJS_PUBLIC_KEY') {
         emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+        console.log('✅ EmailJS initialized');
+    } else {
+        console.log('⚠️ EmailJS not configured. To enable email notifications:');
+        console.log('   1. Sign up at https://www.emailjs.com/');
+        console.log('   2. Add an Email Service');
+        console.log('   3. Create an email template with variables: {{requester_name}}, {{requester_email}}, {{reason}}');
+        console.log('   4. Update EMAILJS_CONFIG in the code');
     }
 }
 
@@ -6962,12 +7206,90 @@ async function requestNotificationPermission() {
     return result === 'granted';
 }
 
-// Register service worker for background push
+// Register service worker for PWA and background push
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW register failed:', e));
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                console.log('✅ Service Worker registered:', registration.scope);
+            })
+            .catch(e => {
+                console.warn('⚠️ Service Worker registration failed:', e);
+                // Don't show error to user - app works without SW
+            });
     }
 }
+
+// PWA Install Prompt handling
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Store the event so it can be triggered later
+    deferredInstallPrompt = e;
+    console.log('📱 PWA install prompt available');
+    // Show install button or banner (optional)
+    showInstallPrompt();
+});
+
+function showInstallPrompt() {
+    // Create an install banner if not already shown
+    if (document.getElementById('pwaInstallBanner')) return;
+    
+    const banner = document.createElement('div');
+    banner.id = 'pwaInstallBanner';
+    banner.className = 'fixed bottom-0 left-0 right-0 bg-indigo-600 text-white p-4 z-50 flex items-center justify-between';
+    banner.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas fa-mobile-alt text-2xl"></i>
+            <div>
+                <p class="font-semibold">Install BD CRM App</p>
+                <p class="text-sm opacity-90">Add to home screen for quick access</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="dismissInstallPrompt()" class="px-3 py-1.5 text-sm opacity-80 hover:opacity-100">Not now</button>
+            <button onclick="installPWA()" class="px-4 py-1.5 bg-white text-indigo-600 rounded-lg font-medium text-sm hover:bg-gray-100">Install</button>
+        </div>
+    `;
+    document.body.appendChild(banner);
+}
+
+function dismissInstallPrompt() {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner) banner.remove();
+}
+
+async function installPWA() {
+    if (!deferredInstallPrompt) {
+        showToast('Install not available. Use "Add to Home Screen" in your browser menu.', 'info');
+        return;
+    }
+    
+    // Show the install prompt
+    deferredInstallPrompt.prompt();
+    
+    // Wait for the user to respond
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    
+    // Clear the deferred prompt
+    deferredInstallPrompt = null;
+    dismissInstallPrompt();
+    
+    if (outcome === 'accepted') {
+        showToast('App is being installed!', 'success');
+    }
+}
+
+// Listen for app installed event
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 PWA was installed');
+    deferredInstallPrompt = null;
+    dismissInstallPrompt();
+    showToast('App installed successfully!', 'success');
+});
 
 function sendPushNotification(title, body, url) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -7621,6 +7943,21 @@ function populateBrandingForm() {
     set('bc_tagline',      b.tagline      || '');
     set('bc_logoUrl',      b.logoUrl      || '');
     set('bc_faviconUrl',   b.faviconUrl   || '');
+    
+    // Show logo preview if logo exists
+    if (b.logoUrl) {
+        document.getElementById('bc_logoUrlInput').value = b.logoUrl.startsWith('data:') ? '(Uploaded image)' : b.logoUrl;
+        document.getElementById('logoPreviewImg').src = b.logoUrl;
+        document.getElementById('logoPreview').classList.remove('hidden');
+    }
+    
+    // Show favicon preview if favicon exists
+    if (b.faviconUrl) {
+        document.getElementById('bc_faviconUrlInput').value = b.faviconUrl.startsWith('data:') ? '(Uploaded image)' : b.faviconUrl;
+        document.getElementById('faviconPreviewImg').src = b.faviconUrl;
+        document.getElementById('faviconPreview').classList.remove('hidden');
+    }
+    
     set('bc_primaryColor',     b.primaryColor  || '#771414');
     set('bc_primaryColorHex',  b.primaryColor  || '#771414');
     set('bc_accentColor',      b.accentColor   || '#FFCD00');
@@ -7646,6 +7983,78 @@ function syncColorFromHex(which) {
         colorEl.value = v;
         livePreviewBrand();
     }
+}
+
+// ==================== LOGO UPLOAD FUNCTIONS ====================
+
+function handleLogoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('Logo file too large. Max 2MB.', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        document.getElementById('bc_logoUrl').value = base64;
+        document.getElementById('bc_logoUrlInput').value = '(Uploaded image)';
+        
+        // Show preview
+        const preview = document.getElementById('logoPreview');
+        const img = document.getElementById('logoPreviewImg');
+        img.src = base64;
+        preview.classList.remove('hidden');
+        
+        livePreviewBrand();
+        showToast('Logo uploaded successfully!', 'success');
+    };
+    reader.readAsDataURL(file);
+}
+
+function handleFaviconUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    if (file.size > 500 * 1024) {
+        showToast('Favicon file too large. Max 500KB.', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        document.getElementById('bc_faviconUrl').value = base64;
+        document.getElementById('bc_faviconUrlInput').value = '(Uploaded image)';
+        
+        // Show preview
+        const preview = document.getElementById('faviconPreview');
+        const img = document.getElementById('faviconPreviewImg');
+        img.src = base64;
+        preview.classList.remove('hidden');
+        
+        showToast('Favicon uploaded successfully!', 'success');
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearLogo() {
+    document.getElementById('bc_logoUrl').value = '';
+    document.getElementById('bc_logoUrlInput').value = '';
+    document.getElementById('bc_logoFile').value = '';
+    document.getElementById('logoPreview').classList.add('hidden');
+    document.getElementById('logoPreviewImg').src = '';
+    livePreviewBrand();
+}
+
+function clearFavicon() {
+    document.getElementById('bc_faviconUrl').value = '';
+    document.getElementById('bc_faviconUrlInput').value = '';
+    document.getElementById('bc_faviconFile').value = '';
+    document.getElementById('faviconPreview').classList.add('hidden');
+    document.getElementById('faviconPreviewImg').src = '';
 }
 
 function livePreviewBrand() {
@@ -8027,6 +8436,8 @@ function collectCustomFieldValues(type) {
 document.addEventListener('DOMContentLoaded', function() {
     initDarkMode();
     applyBrandToUI();
+    initEmailJS();
+    registerServiceWorker();
 
     // Close modals on outside click
     window.onclick = function(event) {
