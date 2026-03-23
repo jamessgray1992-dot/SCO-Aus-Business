@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRFA Intelligence | AUS BD & CRM</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>
+:root {
+    --primary: #771414;
+    --primary-light: #a31a1a;
+    --primary-dark: #550e0e;
+    --accent: #FFCD00;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+    --border: rgba(0,0,0,0.08);
+    --surface: #f8f7f4;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--surface); color:#1a1a1a; }
+.display-font { font-family:'Syne',sans-serif; }
+
+/* ── GLASS PANEL ── */
+.glass-panel { background:rgba(255,255,255,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+
+/* ── NAV ── */
+.drfa-nav { position:sticky; top:0; z-index:40; border-bottom:1px solid var(--border); padding:0 24px; }
+.drfa-nav-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; height:56px; gap:16px; }
+.drfa-logo { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px; background:linear-gradient(135deg,#1e3a5f,#2563eb); flex-shrink:0; }
+.nav-back { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px; border:1px solid var(--border); background:#fff; color:#555; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; transition:all 0.15s; }
+.nav-back:hover { background:#f0f0f0; color:#1a1a1a; }
+
+/* ── STATE TABS ── */
+.state-tabs { display:flex; gap:4px; overflow-x:auto; padding:2px 0; scrollbar-width:none; }
+.state-tabs::-webkit-scrollbar { display:none; }
+.state-tab { padding:6px 14px; border-radius:8px; border:1px solid transparent; background:transparent; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.15s; letter-spacing:0.3px; color:#888; }
+.state-tab:hover { background:rgba(0,0,0,0.04); color:#555; }
+.state-tab.active { background:#1e3a5f; color:#fff; border-color:#1e3a5f; }
+.state-tab.aus-wide { background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; }
+.state-tab.aus-wide:not(.active) { background:rgba(99,102,241,0.08); color:#6366f1; border:1px solid rgba(99,102,241,0.15); }
+
+/* ── LAYOUT ── */
+.drfa-container { max-width:1400px; margin:0 auto; padding:20px 24px; }
+.drfa-grid { display:grid; grid-template-columns:280px 1fr; gap:20px; }
+@media(max-width:900px) { .drfa-grid { grid-template-columns:1fr; } }
+
+/* ── SIDEBAR ── */
+.drfa-sidebar { display:flex; flex-direction:column; gap:12px; }
+.sidebar-card { background:#fff; border-radius:var(--radius); border:1px solid var(--border); padding:16px; }
+.sidebar-card h3 { font-size:11px; font-weight:700; color:#999; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:10px; }
+
+/* ── KPI CARDS ── */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin-bottom:16px; }
+.kpi-card { background:#fff; border-radius:10px; padding:14px 16px; border:1px solid var(--border); border-left:3px solid #3b82f6; }
+.kpi-label { font-size:10px; font-weight:600; color:#999; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:4px; }
+.kpi-value { font-size:22px; font-weight:800; line-height:1.1; }
+
+/* ── TABLE ── */
+.drfa-table-wrap { background:#fff; border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; }
+.drfa-table { width:100%; border-collapse:collapse; font-size:12px; }
+.drfa-table thead th { padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:#999; letter-spacing:0.5px; text-transform:uppercase; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.015); white-space:nowrap; }
+.drfa-table tbody tr { border-bottom:1px solid rgba(0,0,0,0.03); cursor:pointer; transition:background 0.1s; }
+.drfa-table tbody tr:hover { background:rgba(37,99,235,0.03); }
+.drfa-table td { padding:10px 14px; }
+
+/* ── BADGES ── */
+.tier-badge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.3px; }
+.tier-1 { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+.tier-2 { background:#fffbeb; color:#d97706; border:1px solid #fde68a; }
+.tier-3 { background:#f9fafb; color:#6b7280; border:1px solid #e5e7eb; }
+.stage-pill { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
+.stage-Lead { background:rgba(124,58,237,0.08); color:#7c3aed; }
+.stage-Pre-Tender { background:rgba(37,99,235,0.08); color:#2563eb; }
+.stage-Tendering { background:rgba(5,150,105,0.08); color:#059669; }
+.stage-Awarded { background:rgba(217,119,6,0.08); color:#d97706; }
+.stage-Complete { background:rgba(107,114,128,0.08); color:#6b7280; }
+.timeline-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
+.tl-past { background:rgba(99,102,241,0.08); color:#6366f1; }
+.tl-present { background:rgba(5,150,105,0.08); color:#059669; }
+.tl-future { background:rgba(217,119,6,0.08); color:#d97706; }
+.active-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.active-dot.on { background:#059669; }
+.active-dot.off { background:#d1d5db; }
+
+/* ── AI SEARCH BAR ── */
+.ai-bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; background:rgba(99,102,241,0.04); border-radius:12px; border:1px solid rgba(99,102,241,0.1); margin-bottom:16px; }
+.ai-btn { display:flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; border:none; background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; font-weight:700; font-size:12px; cursor:pointer; box-shadow:0 2px 8px rgba(79,70,229,0.3); letter-spacing:0.3px; transition:all 0.2s; }
+.ai-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(79,70,229,0.4); }
+.ai-btn:disabled { opacity:0.7; cursor:wait; }
+.ai-btn i { font-size:11px; }
+
+/* ── VIEW TOGGLE ── */
+.view-btn { padding:6px 14px; border-radius:6px; border:1px solid var(--border); background:#fff; font-size:12px; font-weight:600; cursor:pointer; color:#888; transition:all 0.15s; }
+.view-btn.active { border-color:#4f46e5; background:#eef2ff; color:#4f46e5; }
+
+/* ── FILTER ROW ── */
+.filter-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center; }
+.filter-row select, .filter-row input[type="text"] { padding:7px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.12); font-size:11px; background:#fff; outline:none; }
+.filter-row input[type="text"] { width:180px; }
+.filter-count { font-size:11px; color:#aaa; margin-left:auto; }
+
+/* ── SCORE BAR ── */
+.score-bar-track { flex:1; height:5px; background:rgba(0,0,0,0.06); border-radius:3px; overflow:hidden; }
+.score-bar-fill { height:100%; border-radius:3px; transition:width 0.4s ease; }
+
+/* ── TIMELINE VIEW ── */
+.timeline-section { margin-bottom:20px; }
+.timeline-header { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; margin-bottom:10px; }
+.timeline-header .icon { font-size:16px; }
+.timeline-header .count { margin-left:auto; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:700; }
+.timeline-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:8px; }
+.timeline-card { padding:12px 14px; border-radius:10px; cursor:pointer; background:#fff; border:1px solid rgba(0,0,0,0.06); transition:all 0.15s; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.timeline-card:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+
+/* ── DETAIL DRAWER ── */
+.drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:99; backdrop-filter:blur(2px); }
+.drawer { position:fixed; top:0; right:0; bottom:0; width:440px; max-width:92vw; background:#fff; z-index:100; overflow-y:auto; border-left:1px solid var(--border); box-shadow:-8px 0 40px rgba(0,0,0,0.12); }
+.drawer-header { padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; z-index:1; }
+.drawer-close { width:32px; height:32px; border-radius:8px; border:none; background:rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:background 0.15s; }
+.drawer-close:hover { background:rgba(0,0,0,0.1); }
+.drawer-body { padding:16px 24px; }
+.drawer-section-title { font-size:11px; font-weight:700; color:#999; letter-spacing:0.6px; text-transform:uppercase; margin:16px 0 8px; }
+.score-breakdown-row { margin-bottom:8px; }
+.score-breakdown-label { display:flex; justify-content:space-between; font-size:11px; color:#888; margin-bottom:2px; }
+.mini-stat { background:rgba(0,0,0,0.03); border-radius:10px; padding:12px 14px; border-left:3px solid #3b82f6; }
+.mini-stat .label { font-size:10px; font-weight:600; color:#999; letter-spacing:0.4px; text-transform:uppercase; margin-bottom:2px; }
+.mini-stat .value { font-size:18px; font-weight:700; }
+.cat-badge { padding:4px 12px; border-radius:8px; font-size:11px; font-weight:600; }
+.cat-active { background:rgba(59,130,246,0.08); color:#2563eb; border:1px solid rgba(59,130,246,0.15); }
+.cat-inactive { background:rgba(0,0,0,0.02); color:rgba(0,0,0,0.2); }
+.work-chip { padding:3px 10px; border-radius:6px; font-size:11px; font-weight:500; background:#f0fdf4; color:#166534; border:1px solid rgba(187,247,208,0.3); }
+
+/* ── VFM PANEL ── */
+.vfm-panel { margin-top:16px; padding:16px 18px; border-radius:12px; background:rgba(99,102,241,0.03); border:1px solid rgba(99,102,241,0.08); }
+.vfm-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-top:10px; }
+.vfm-card { padding:12px; background:#fff; border-radius:8px; border:1px solid rgba(0,0,0,0.04); font-size:12px; color:#555; line-height:1.5; }
+.vfm-card strong { font-weight:700; }
+
+/* ── FORMULA ── */
+.formula-panel { margin-top:12px; padding:14px 18px; border-radius:10px; background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.04); }
+.formula-panel code { font-size:11px; background:rgba(0,0,0,0.04); padding:2px 8px; border-radius:4px; font-family:'DM Mono',monospace; }
+
+/* ── ANIMATIONS ── */
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.fade-in { animation:fadeIn 0.3s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NAVIGATION
+     ══════════════════════════════════════════════════════════════════ -->
+<nav class="drfa-nav glass-panel">
+    <div class="drfa-nav-inner">
+        <div class="drfa-logo">DR</div>
+        <div>
+            <div class="display-font" style="font-size:15px;font-weight:700;">DRFA Intelligence</div>
+            <div style="font-size:10px;color:#999;">Disaster Recovery Funding Analysis</div>
+        </div>
+        <a href="index.html" class="nav-back" style="margin-left:auto;">
+            <i class="fas fa-arrow-left"></i> Back to AUS BD & CRM
+        </a>
+    </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     STATE TABS (AUS-WIDE + individual states)
+     ══════════════════════════════════════════════════════════════════ -->
+<div style="background:#fff;border-bottom:1px solid var(--border);padding:8px 24px;">
+    <div style="max-width:1400px;margin:0 auto;">
+        <div class="state-tabs" id="stateTabs">
+            <!-- populated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     MAIN CONTENT
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="drfa-container">
+
+    <!-- KPI ROW -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- AI SEARCH BAR -->
+    <div class="ai-bar">
+        <button class="ai-btn" id="aiSearchBtn" onclick="triggerAISearch()">
+            <i class="fas fa-bolt"></i> AI search for new DRFA events
+        </button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:flex-end;">
+            <button class="view-btn active" data-view="table" onclick="switchView('table')">
+                <i class="fas fa-table" style="margin-right:4px;"></i>Table
+            </button>
+            <button class="view-btn" data-view="timeline" onclick="switchView('timeline')">
+                <i class="fas fa-stream" style="margin-right:4px;"></i>Past / Present / Future
+            </button>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-row" id="filterRow"></div>
+
+    <!-- MAIN GRID: Sidebar + Content -->
+    <div class="drfa-grid">
+
+        <!-- SIDEBAR -->
+        <div class="drfa-sidebar" id="sidebar">
+            <!-- Region breakdown card -->
+            <div class="sidebar-card">
+                <h3>Region breakdown</h3>
+                <div id="regionBreakdown"></div>
+            </div>
+            <!-- Tier summary -->
+            <div class="sidebar-card">
+                <h3>Tier distribution</h3>
+                <div id="tierSummary"></div>
+            </div>
+            <!-- Top opportunities -->
+            <div class="sidebar-card">
+                <h3>Top 5 opportunities</h3>
+                <div id="topOpportunities"></div>
+            </div>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div>
+            <div id="tableView"></div>
+            <div id="timelineView" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- VALUE FOR MONEY PANEL -->
+    <div class="vfm-panel">
+        <div style="font-size:11px;font-weight:700;color:#4f46e5;letter-spacing:0.5px;text-transform:uppercase;">Value for money indicators</div>
+        <div class="vfm-grid">
+            <div class="vfm-card"><strong style="color:#059669;">High VFM zones:</strong> Low competition + high infrastructure score = best $/effort ratio. Target remote QLD/NT councils.</div>
+            <div class="vfm-card"><strong style="color:#d97706;">Repeat pipeline:</strong> LGAs with flood_freq ≥ 8 generate recurring work. Past completions validate future bids.</div>
+            <div class="vfm-card"><strong style="color:#7c3aed;">Category B focus:</strong> Infrastructure reconstruction (roads, culverts, drainage) is the primary civil spend in DRFA.</div>
+        </div>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="formula-panel">
+        <div style="font-size:11px;font-weight:700;color:#999;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Scoring formula</div>
+        <code>Score = (F×0.30) + (I×0.25) + (R×0.20) + ((10-C)×0.15) + (A×0.10) × 10 + event_boost</code>
+        <div style="font-size:11px;color:#aaa;margin-top:4px;">F = Flood frequency · I = Infrastructure · R = Recovery scale · C = Competition (inverted) · A = Accessibility · Event boost: +6 / +12 / +20</div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     DETAIL DRAWER
+     ══════════════════════════════════════════════════════════════════ -->
+<div id="drawerOverlay" class="drawer-overlay" style="display:none;" onclick="closeDrawer()"></div>
+<div id="drawer" class="drawer" style="display:none;"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     DRFA DATA + ENGINE
+     ══════════════════════════════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════════
+// CONFIG — matches AUS BD & CRM states
+// ═══════════════════════════════════════
+const STATES = {
+    AUS: { name:'Australia Wide', code:'AUS', color:'#4F46E5' },
+    QLD: { name:'Queensland', code:'QLD', color:'#7B1F3A' },
+    NSW: { name:'New South Wales', code:'NSW', color:'#00247D' },
+    VIC: { name:'Victoria', code:'VIC', color:'#000080' },
+    NT:  { name:'Northern Territory', code:'NT', color:'#E65C00' },
+    WA:  { name:'Western Australia', code:'WA', color:'#DAA520' },
+    SA:  { name:'South Australia', code:'SA', color:'#D40000' },
+    TAS: { name:'Tasmania', code:'TAS', color:'#005F3C' },
+    ACT: { name:'ACT', code:'ACT', color:'#0055A4' }
+};
+
+const TIERS = {
+    1: { label:'Tier 1', cls:'tier-1', color:'#dc2626', desc:'Aggressive pursuit' },
+    2: { label:'Tier 2', cls:'tier-2', color:'#d97706', desc:'Opportunistic' },
+    3: { label:'Tier 3', cls:'tier-3', color:'#6b7280', desc:'Monitor only' }
+};
+
+const TIMELINE = {
+    past:    { label:'Past works',     icon:'fas fa-history',    color:'#6366f1', cls:'tl-past',    desc:'Historical DRFA activations & completed recovery' },
+    present: { label:'Active now',     icon:'fas fa-circle',     color:'#059669', cls:'tl-present', desc:'Current DRFA events & live opportunities' },
+    future:  { label:'Future targets', icon:'fas fa-crosshairs', color:'#d97706', cls:'tl-future',  desc:'Predicted high-value regions based on scoring' }
+};
+
+const STAGES = ['Lead','Pre-Tender','Tendering','Awarded','Complete'];
+const CATEGORIES = ['A','B','C','D'];
+
+// ═══════════════════════════════════════
+// SEED DATA — Top 50+ DRFA LGAs
+// Linked to AUS BD & CRM region IDs
+// ═══════════════════════════════════════
+const DRFA_DATA = [
+    // ── NSW: Northern Rivers ──
+    { id:1, name:'Lismore City', state:'NSW', region:'Northern Rivers', regionId:'NC-LIS', zone:'NC', flood_freq:10, infra:7, recovery:10, competition:8, access:8, last_event:'2024-03-15', active:true, cats:['A','B','C'], works:['Roads','Drainage','Levees'], stage:'Tendering', est_value:5200000, notes:'Repeated catastrophic flooding 2017-2024', timeline:'present' },
+    { id:2, name:'Ballina Shire', state:'NSW', region:'Northern Rivers', regionId:'NC-BAL', zone:'NC', flood_freq:9, infra:7, recovery:9, competition:7, access:8, last_event:'2024-03-15', active:true, cats:['A','B'], works:['Roads','Culverts'], stage:'Pre-Tender', est_value:3800000, notes:'Major road network damage each event', timeline:'present' },
+    { id:3, name:'Tweed Shire', state:'NSW', region:'Northern Rivers', regionId:'NC-TWE', zone:'NC', flood_freq:8, infra:7, recovery:8, competition:8, access:9, last_event:'2024-03-15', active:false, cats:['A','B'], works:['Drainage','Roads'], stage:'Complete', est_value:2900000, notes:'Coastal flood zone', timeline:'past' },
+    { id:4, name:'Richmond Valley', state:'NSW', region:'Northern Rivers', regionId:'NC-RIC', zone:'NC', flood_freq:8, infra:6, recovery:8, competition:6, access:7, last_event:'2024-03-15', active:false, cats:['B','C'], works:['Roads','Bridges'], stage:'Complete', est_value:2100000, notes:'Rural road reconstruction', timeline:'past' },
+    { id:5, name:'Clarence Valley', state:'NSW', region:'Northern Rivers', regionId:'NC-CLA', zone:'NC', flood_freq:9, infra:7, recovery:8, competition:6, access:7, last_event:'2024-03-15', active:true, cats:['B'], works:['Roads','Culverts','Drainage'], stage:'Lead', est_value:3200000, notes:'Large floodplain exposure', timeline:'present' },
+    { id:6, name:'Kyogle', state:'NSW', region:'Northern Rivers', regionId:'NC-KYO', zone:'NC', flood_freq:7, infra:6, recovery:7, competition:4, access:6, last_event:'2023-06-20', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Complete', est_value:1400000, notes:'Remote rural council', timeline:'past' },
+    // ── NSW: Central West ──
+    { id:7, name:'Forbes Shire', state:'NSW', region:'Central West', regionId:'CWT-FOR', zone:'CWT', flood_freq:7, infra:6, recovery:7, competition:5, access:7, last_event:'2023-11-01', active:false, cats:['A','B'], works:['Roads','Drainage'], stage:'Lead', est_value:1800000, notes:'Lachlan River flooding', timeline:'future' },
+    { id:8, name:'Dubbo Regional', state:'NSW', region:'Central West', regionId:'CWT-DUB', zone:'CWT', flood_freq:6, infra:7, recovery:6, competition:6, access:8, last_event:'2023-11-01', active:false, cats:['B'], works:['Roads','Drainage'], stage:'Lead', est_value:2200000, notes:'Macquarie River basin', timeline:'future' },
+    { id:9, name:'Wagga Wagga', state:'NSW', region:'Riverina', regionId:'RIV-WAG', zone:'RIV', flood_freq:6, infra:7, recovery:6, competition:7, access:8, last_event:'2023-08-10', active:false, cats:['A','B'], works:['Roads','Levees'], stage:'Complete', est_value:2800000, notes:'Murrumbidgee flooding', timeline:'past' },
+    { id:10, name:'Parkes Shire', state:'NSW', region:'Central West', regionId:'CWT-PAR', zone:'CWT', flood_freq:6, infra:6, recovery:5, competition:5, access:7, last_event:'2023-11-01', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:1200000, notes:'Inland flood exposure', timeline:'future' },
+    { id:11, name:'Bathurst Regional', state:'NSW', region:'Central West', regionId:'CWT-BAT', zone:'CWT', flood_freq:5, infra:6, recovery:5, competition:6, access:8, last_event:'2022-11-01', active:false, cats:['B'], works:['Roads','Drainage'], stage:'Complete', est_value:1600000, notes:'Macquarie catchment', timeline:'past' },
+    { id:44, name:'Coffs Harbour City', state:'NSW', region:'Mid North Coast', regionId:'NC-COF', zone:'NC', flood_freq:6, infra:6, recovery:6, competition:7, access:9, last_event:'2024-03-15', active:false, cats:['A','B'], works:['Drainage','Roads'], stage:'Complete', est_value:2000000, notes:'East coast low exposure', timeline:'past' },
+    { id:45, name:'Kempsey Shire', state:'NSW', region:'Mid North Coast', regionId:'NC-KYM', zone:'NC', flood_freq:7, infra:6, recovery:6, competition:5, access:7, last_event:'2024-03-15', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:1600000, notes:'Macleay River flooding', timeline:'future' },
+
+    // ── QLD: Central/Western ──
+    { id:12, name:'Longreach Regional', state:'QLD', region:'Central West QLD', regionId:'SWQ-LR', zone:'SWQ', flood_freq:9, infra:9, recovery:8, competition:3, access:4, last_event:'2026-02-10', active:true, cats:['B','C'], works:['Roads','Culverts','Access roads'], stage:'Lead', est_value:4000000, notes:'Huge road network, low competition', timeline:'present' },
+    { id:13, name:'Winton Shire', state:'QLD', region:'Central West QLD', regionId:'NQ-WC', zone:'NQ', flood_freq:8, infra:8, recovery:7, competition:2, access:3, last_event:'2026-02-10', active:true, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:3500000, notes:'Remote western QLD, massive road damage', timeline:'present' },
+    { id:14, name:'Barcaldine Regional', state:'QLD', region:'Central West QLD', regionId:'CQ-BAR', zone:'CQ', flood_freq:8, infra:8, recovery:7, competition:2, access:3, last_event:'2026-02-10', active:true, cats:['B'], works:['Roads','Access roads'], stage:'Lead', est_value:3000000, notes:'Repeat activation zone', timeline:'present' },
+    { id:15, name:'Blackall-Tambo Regional', state:'QLD', region:'Central West QLD', regionId:'SWQ-BT', zone:'SWQ', flood_freq:7, infra:7, recovery:6, competition:2, access:3, last_event:'2025-01-20', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Pre-Tender', est_value:2200000, notes:'Western floodplain', timeline:'future' },
+    { id:16, name:'Diamantina Shire', state:'QLD', region:'Central West QLD', regionId:'SWQ-DI', zone:'SWQ', flood_freq:7, infra:8, recovery:6, competition:1, access:2, last_event:'2025-01-20', active:false, cats:['B'], works:['Roads','Access roads'], stage:'Lead', est_value:2800000, notes:'Most remote, lowest competition nationally', timeline:'future' },
+
+    // ── QLD: North / Gulf ──
+    { id:17, name:'Townsville City', state:'QLD', region:'North QLD', regionId:'NQ-TC', zone:'NQ', flood_freq:8, infra:7, recovery:9, competition:7, access:8, last_event:'2025-03-01', active:true, cats:['A','B','C'], works:['Drainage','Roads','Scour repair'], stage:'Tendering', est_value:6500000, notes:'Major flooding 2019, 2025', timeline:'present' },
+    { id:18, name:'Charters Towers Regional', state:'QLD', region:'North QLD', regionId:'NQ-CT', zone:'NQ', flood_freq:7, infra:7, recovery:7, competition:4, access:6, last_event:'2025-03-01', active:true, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:2400000, notes:'Inland north QLD', timeline:'present' },
+    { id:19, name:'Burdekin Shire', state:'QLD', region:'North QLD', regionId:'NQ-BS', zone:'NQ', flood_freq:8, infra:7, recovery:7, competition:5, access:7, last_event:'2025-03-01', active:true, cats:['B','C'], works:['Roads','Bridges','Scour repair'], stage:'Pre-Tender', est_value:3600000, notes:'Burdekin River basin', timeline:'present' },
+    { id:20, name:'Cassowary Coast Regional', state:'QLD', region:'Far North QLD', regionId:'FNQ-CC', zone:'FNQ', flood_freq:8, infra:6, recovery:7, competition:5, access:6, last_event:'2025-03-01', active:false, cats:['A','B'], works:['Roads','Drainage'], stage:'Lead', est_value:2600000, notes:'Cyclone + flood exposure', timeline:'future' },
+    { id:21, name:'Cairns Regional', state:'QLD', region:'Far North QLD', regionId:'NQ-CC', zone:'FNQ', flood_freq:7, infra:6, recovery:7, competition:7, access:8, last_event:'2024-12-15', active:false, cats:['A','B'], works:['Drainage','Roads'], stage:'Complete', est_value:3400000, notes:'Tropical flood zone', timeline:'past' },
+    { id:22, name:'Carpentaria Shire', state:'QLD', region:'Gulf Country', regionId:'GULF-CAR', zone:'GULF', flood_freq:9, infra:8, recovery:8, competition:2, access:2, last_event:'2026-01-15', active:true, cats:['B','D'], works:['Roads','Access roads','Culverts'], stage:'Lead', est_value:4200000, notes:'Gulf flooding — extreme remote', timeline:'present' },
+    { id:23, name:'Burke Shire', state:'QLD', region:'Gulf Country', regionId:'GULF-BS', zone:'GULF', flood_freq:8, infra:7, recovery:7, competition:1, access:2, last_event:'2026-01-15', active:true, cats:['B'], works:['Roads','Access roads'], stage:'Lead', est_value:2800000, notes:'Lowest competition nationally', timeline:'present' },
+    { id:38, name:'Doomadgee Aboriginal Shire', state:'QLD', region:'Gulf Country', regionId:'GULF-DO', zone:'GULF', flood_freq:8, infra:7, recovery:7, competition:1, access:1, last_event:'2026-01-15', active:true, cats:['B','D'], works:['Access roads','Roads'], stage:'Lead', est_value:2200000, notes:'Extreme remote Indigenous community', timeline:'present' },
+    { id:39, name:'Mornington Shire', state:'QLD', region:'Gulf Country', regionId:'GULF-MOR', zone:'GULF', flood_freq:7, infra:6, recovery:6, competition:1, access:1, last_event:'2026-01-15', active:true, cats:['B'], works:['Access roads'], stage:'Lead', est_value:1500000, notes:'Gulf island community', timeline:'present' },
+    { id:41, name:'Kowanyama Aboriginal Shire', state:'QLD', region:'Far North QLD', regionId:'FNQ-KO', zone:'FNQ', flood_freq:9, infra:7, recovery:7, competition:1, access:1, last_event:'2025-12-20', active:true, cats:['B','D'], works:['Access roads','Roads'], stage:'Lead', est_value:2000000, notes:'Cape York remote community', timeline:'present' },
+    { id:42, name:'Pormpuraaw Aboriginal Shire', state:'QLD', region:'Far North QLD', regionId:'FNQ-PO', zone:'FNQ', flood_freq:8, infra:6, recovery:6, competition:1, access:1, last_event:'2025-12-20', active:true, cats:['B'], works:['Access roads'], stage:'Lead', est_value:1200000, notes:'Remote western Cape York', timeline:'present' },
+    { id:43, name:'Etheridge Shire', state:'QLD', region:'Gulf Country', regionId:'FNQ-EA', zone:'GULF', flood_freq:7, infra:7, recovery:6, competition:2, access:3, last_event:'2025-06-10', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Pre-Tender', est_value:1800000, notes:'Inland Gulf savannah', timeline:'future' },
+
+    // ── VIC: Northern floodplains ──
+    { id:24, name:'Campaspe Shire', state:'VIC', region:'Northern VIC', regionId:'LOD-CAM', zone:'LOD', flood_freq:8, infra:8, recovery:7, competition:6, access:9, last_event:'2026-01-20', active:true, cats:['A','B','C'], works:['Roads','Culverts','Drainage','Levees'], stage:'Tendering', est_value:2500000, notes:'2022 floods — major recovery pipeline', timeline:'present' },
+    { id:25, name:'Greater Shepparton', state:'VIC', region:'Northern VIC', regionId:'HUM-GSC', zone:'HUM', flood_freq:8, infra:7, recovery:8, competition:6, access:9, last_event:'2026-01-20', active:true, cats:['A','B','C'], works:['Roads','Drainage','Levees'], stage:'Pre-Tender', est_value:3200000, notes:'Goulburn River basin', timeline:'present' },
+    { id:26, name:'Moira Shire', state:'VIC', region:'Northern VIC', regionId:'HUM-MOI', zone:'HUM', flood_freq:7, infra:7, recovery:7, competition:5, access:8, last_event:'2026-01-20', active:true, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:1800000, notes:'Murray River flooding', timeline:'present' },
+    { id:27, name:'Loddon Shire', state:'VIC', region:'Northern VIC', regionId:'LOD-LOD', zone:'LOD', flood_freq:7, infra:7, recovery:6, competition:4, access:8, last_event:'2023-09-15', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Complete', est_value:1600000, notes:'Loddon River floodplain', timeline:'past' },
+    { id:28, name:'Gannawarra Shire', state:'VIC', region:'Northern VIC', regionId:'LOD-GAN', zone:'LOD', flood_freq:7, infra:7, recovery:6, competition:4, access:7, last_event:'2023-09-15', active:false, cats:['B'], works:['Roads','Drainage'], stage:'Complete', est_value:1400000, notes:'Irrigation country flooding', timeline:'past' },
+    { id:29, name:'Buloke Shire', state:'VIC', region:'Northern VIC', regionId:'LOD-BUL', zone:'LOD', flood_freq:6, infra:6, recovery:5, competition:3, access:6, last_event:'2023-09-15', active:false, cats:['B'], works:['Roads','Culverts'], stage:'Lead', est_value:1000000, notes:'Low competition rural', timeline:'future' },
+    { id:30, name:'Swan Hill Rural City', state:'VIC', region:'Northern VIC', regionId:'LOD-SWA', zone:'LOD', flood_freq:6, infra:6, recovery:5, competition:4, access:7, last_event:'2023-09-15', active:false, cats:['B'], works:['Roads','Levees'], stage:'Lead', est_value:1200000, notes:'Murray River exposure', timeline:'future' },
+    { id:31, name:'Benalla Rural City', state:'VIC', region:'Northern VIC', regionId:'HUM-BEN', zone:'HUM', flood_freq:6, infra:5, recovery:5, competition:5, access:8, last_event:'2022-10-20', active:false, cats:['B'], works:['Roads','Drainage'], stage:'Complete', est_value:800000, notes:'Moderate flood risk', timeline:'past' },
+
+    // ── NT ──
+    { id:32, name:'Barkly Regional', state:'NT', region:'Barkly', regionId:'BARK-BAR', zone:'BARK', flood_freq:7, infra:8, recovery:8, competition:2, access:2, last_event:'2026-02-01', active:true, cats:['B','D'], works:['Roads','Access roads','Culverts'], stage:'Lead', est_value:5000000, notes:'Remote NT — very low competition', timeline:'present' },
+    { id:33, name:'Katherine Town', state:'NT', region:'Big Rivers', regionId:'BIG-KAT', zone:'BIG', flood_freq:7, infra:6, recovery:7, competition:3, access:4, last_event:'2026-02-01', active:true, cats:['A','B','C'], works:['Roads','Drainage','Bridges'], stage:'Pre-Tender', est_value:3500000, notes:'Katherine River flooding', timeline:'present' },
+    { id:34, name:'Central Desert Regional', state:'NT', region:'Central Australia', regionId:'CENT-CEN', zone:'CENT', flood_freq:6, infra:7, recovery:6, competition:1, access:2, last_event:'2026-02-01', active:true, cats:['B'], works:['Roads','Access roads'], stage:'Lead', est_value:3800000, notes:'Extreme remote — exceptional circumstances', timeline:'present' },
+
+    // ── WA ──
+    { id:35, name:'Derby-West Kimberley', state:'WA', region:'Kimberley', regionId:'KIM-DER', zone:'KIM', flood_freq:8, infra:8, recovery:8, competition:3, access:3, last_event:'2025-03-10', active:true, cats:['B','D'], works:['Roads','Bridges','Access roads'], stage:'Lead', est_value:6000000, notes:'Kimberley monsoon flooding', timeline:'present' },
+    { id:36, name:'Broome Shire', state:'WA', region:'Kimberley', regionId:'KIM-BRO', zone:'KIM', flood_freq:7, infra:6, recovery:7, competition:4, access:4, last_event:'2025-03-10', active:false, cats:['A','B'], works:['Roads','Drainage'], stage:'Pre-Tender', est_value:2800000, notes:'Tropical flood/cyclone zone', timeline:'future' },
+
+    // ── SA ──
+    { id:37, name:'Mid Murray Council', state:'SA', region:'River Murray', regionId:'YOR-MID', zone:'YOR', flood_freq:6, infra:6, recovery:6, competition:5, access:7, last_event:'2023-06-01', active:false, cats:['A','B'], works:['Roads','Levees','Drainage'], stage:'Complete', est_value:1800000, notes:'2022-23 Murray River flooding', timeline:'past' },
+    { id:40, name:'Renmark Paringa', state:'SA', region:'River Murray', regionId:'BAR-REN', zone:'BAR', flood_freq:5, infra:5, recovery:5, competition:5, access:7, last_event:'2023-06-01', active:false, cats:['B'], works:['Roads','Levees'], stage:'Complete', est_value:1200000, notes:'Riverland flooding', timeline:'past' }
+];
+
+// ═══════════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════════
+function calcScore(l) {
+    const base = (l.flood_freq*0.30 + l.infra*0.25 + l.recovery*0.20 + (10-l.competition)*0.15 + l.access*0.10) * 10;
+    const boost = l.active ? (l.recovery >= 9 ? 20 : l.recovery >= 7 ? 12 : 6) : 0;
+    return Math.min(100, Math.round(base + boost));
+}
+function getTier(s) { return s >= 80 ? 1 : s >= 65 ? 2 : 3; }
+
+// Enrich data
+const allLGAs = DRFA_DATA.map(l => {
+    const score = calcScore(l);
+    return { ...l, score, tier: getTier(score) };
+}).sort((a,b) => b.score - a.score);
+
+// ═══════════════════════════════════════
+// STATE + FILTER
+// ═══════════════════════════════════════
+let currentDRFAState = 'AUS';
+let currentView = 'table';
+let filters = { search:'', tier:'all', timeline:'all', stage:'all', active:'all', region:'all', sortBy:'score' };
+let selectedLGA = null;
+
+function getFiltered() {
+    let r = allLGAs;
+    if (currentDRFAState !== 'AUS') r = r.filter(l => l.state === currentDRFAState);
+    if (filters.tier !== 'all') r = r.filter(l => l.tier === +filters.tier);
+    if (filters.timeline !== 'all') r = r.filter(l => l.timeline === filters.timeline);
+    if (filters.stage !== 'all') r = r.filter(l => l.stage === filters.stage);
+    if (filters.active !== 'all') r = r.filter(l => filters.active==='true' ? l.active : !l.active);
+    if (filters.region !== 'all') r = r.filter(l => l.region === filters.region);
+    if (filters.search) { const q = filters.search.toLowerCase(); r = r.filter(l => l.name.toLowerCase().includes(q) || l.region.toLowerCase().includes(q)); }
+    r.sort((a,b) => {
+        if (filters.sortBy==='score') return b.score - a.score;
+        if (filters.sortBy==='value') return b.est_value - a.est_value;
+        if (filters.sortBy==='freq') return b.flood_freq - a.flood_freq;
+        if (filters.sortBy==='name') return a.name.localeCompare(b.name);
+        return 0;
+    });
+    return r;
+}
+
+function getRegions() {
+    const src = currentDRFAState === 'AUS' ? allLGAs : allLGAs.filter(l => l.state === currentDRFAState);
+    return [...new Set(src.map(l => l.region))].sort();
+}
+
+// ═══════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════
+
+function renderStateTabs() {
+    const el = document.getElementById('stateTabs');
+    el.innerHTML = Object.entries(STATES).map(([code, s]) =>
+        `<button class="state-tab ${code === currentDRFAState ? 'active' : ''} ${code === 'AUS' ? 'aus-wide' : ''}" onclick="switchDRFAState('${code}')">${code === 'AUS' ? '<i class=\"fas fa-globe-asia\" style=\"margin-right:4px;\"></i>' : ''}${s.name}</button>`
+    ).join('');
+}
+
+function renderKPIs() {
+    const data = getFiltered();
+    const active = data.filter(l => l.active);
+    const t1 = data.filter(l => l.tier === 1);
+    const totalVal = data.reduce((s,l) => s + l.est_value, 0);
+    const stateCount = [...new Set(data.map(l => l.state))].length;
+
+    document.getElementById('kpiRow').innerHTML = [
+        { label:'Total LGAs', value:data.length, color:'#1e3a5f' },
+        { label:'Active events', value:active.length, color:'#059669' },
+        { label:'Tier 1 targets', value:t1.length, color:'#dc2626' },
+        { label:'Pipeline value', value:'$' + Math.round(totalVal/1e6) + 'M', color:'#7c3aed' },
+        { label:'States', value:stateCount, color:'#d97706' }
+    ].map(k => `<div class="kpi-card" style="border-left-color:${k.color}"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div></div>`).join('');
+}
+
+function renderFilters() {
+    const regions = getRegions();
+    document.getElementById('filterRow').innerHTML = `
+        <input type="text" placeholder="Search LGA or region..." value="${filters.search}" oninput="filters.search=this.value;renderAll()">
+        <select onchange="filters.region=this.value;renderAll()"><option value="all">All regions</option>${regions.map(r=>`<option value="${r}" ${filters.region===r?'selected':''}>${r}</option>`).join('')}</select>
+        <select onchange="filters.tier=this.value;renderAll()"><option value="all">All tiers</option><option value="1" ${filters.tier==='1'?'selected':''}>Tier 1</option><option value="2" ${filters.tier==='2'?'selected':''}>Tier 2</option><option value="3" ${filters.tier==='3'?'selected':''}>Tier 3</option></select>
+        <select onchange="filters.timeline=this.value;renderAll()"><option value="all">All phases</option><option value="past" ${filters.timeline==='past'?'selected':''}>Past</option><option value="present" ${filters.timeline==='present'?'selected':''}>Present</option><option value="future" ${filters.timeline==='future'?'selected':''}>Future</option></select>
+        <select onchange="filters.stage=this.value;renderAll()"><option value="all">All stages</option>${STAGES.map(s=>`<option value="${s}" ${filters.stage===s?'selected':''}>${s}</option>`).join('')}</select>
+        <select onchange="filters.active=this.value;renderAll()"><option value="all">All status</option><option value="true" ${filters.active==='true'?'selected':''}>Active</option><option value="false" ${filters.active==='false'?'selected':''}>Inactive</option></select>
+        <select onchange="filters.sortBy=this.value;renderAll()"><option value="score">Sort: Score</option><option value="value">Sort: Value</option><option value="freq">Sort: Frequency</option><option value="name">Sort: Name</option></select>
+        <span class="filter-count">${getFiltered().length} of ${currentDRFAState==='AUS'?allLGAs.length:allLGAs.filter(l=>l.state===currentDRFAState).length} LGAs</span>
+    `;
+}
+
+function renderSidebar() {
+    const data = getFiltered();
+
+    // Region breakdown
+    const regionMap = {};
+    data.forEach(l => { regionMap[l.region] = (regionMap[l.region]||0) + 1; });
+    const sortedRegions = Object.entries(regionMap).sort((a,b) => b[1]-a[1]);
+    document.getElementById('regionBreakdown').innerHTML = sortedRegions.map(([r,c]) =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;" onclick="filters.region='${r}';renderAll()">
+            <span style="font-size:12px;font-weight:500;">${r}</span>
+            <span style="font-size:11px;font-weight:700;color:#2563eb;background:rgba(37,99,235,0.08);padding:2px 8px;border-radius:10px;">${c}</span>
+        </div>`
+    ).join('') || '<div style="font-size:12px;color:#aaa;padding:8px 0;">No data</div>';
+
+    // Tier summary
+    const tierCounts = { 1:0, 2:0, 3:0 };
+    data.forEach(l => tierCounts[l.tier]++);
+    document.getElementById('tierSummary').innerHTML = [1,2,3].map(t => {
+        const pct = data.length ? Math.round((tierCounts[t]/data.length)*100) : 0;
+        return `<div style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;">
+                <span class="tier-badge ${TIERS[t].cls}">${TIERS[t].label}</span>
+                <span style="font-weight:700;color:${TIERS[t].color}">${tierCounts[t]} (${pct}%)</span>
+            </div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct}%;background:${TIERS[t].color};"></div></div>
+        </div>`;
+    }).join('');
+
+    // Top 5
+    const top5 = data.slice(0,5);
+    document.getElementById('topOpportunities').innerHTML = top5.map((l,i) =>
+        `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.03);cursor:pointer;" onclick="openDrawer(${l.id})">
+            <span style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:${TIERS[l.tier].color}12;color:${TIERS[l.tier].color};">${i+1}</span>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
+                <div style="font-size:10px;color:#999;">${l.state} · $${(l.est_value/1e6).toFixed(1)}M</div>
+            </div>
+            <span style="font-size:14px;font-weight:800;color:${TIERS[l.tier].color};">${l.score}</span>
+        </div>`
+    ).join('') || '<div style="font-size:12px;color:#aaa;padding:8px 0;">No data</div>';
+}
+
+function renderTable() {
+    const data = getFiltered();
+    document.getElementById('tableView').innerHTML = `<div class="drfa-table-wrap"><table class="drfa-table">
+        <thead><tr>
+            <th>#</th><th>LGA</th><th>State</th><th>Region</th><th>Score</th><th>Tier</th><th>Phase</th><th>Stage</th><th>Est. value</th><th>Freq</th><th>Active</th>
+        </tr></thead>
+        <tbody>${data.map((l,i) => `<tr onclick="openDrawer(${l.id})" class="fade-in" style="animation-delay:${Math.min(i*15,300)}ms">
+            <td style="font-weight:600;color:#ccc;">${i+1}</td>
+            <td style="font-weight:600;">${l.name}</td>
+            <td><span style="font-weight:700;color:${STATES[l.state]?.color||'#555'};font-size:11px;">${l.state}</span></td>
+            <td style="color:#888;">${l.region}</td>
+            <td><span style="font-weight:800;font-size:14px;color:${TIERS[l.tier].color};">${l.score}</span></td>
+            <td><span class="tier-badge ${TIERS[l.tier].cls}">${TIERS[l.tier].label}</span></td>
+            <td><span class="timeline-badge ${TIMELINE[l.timeline].cls}"><i class="${TIMELINE[l.timeline].icon}" style="font-size:7px;"></i> ${TIMELINE[l.timeline].label}</span></td>
+            <td><span class="stage-pill stage-${l.stage}">${l.stage}</span></td>
+            <td style="font-weight:600;">$${(l.est_value/1e6).toFixed(1)}M</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <div class="score-bar-track" style="width:40px;"><div class="score-bar-fill" style="width:${l.flood_freq*10}%;background:${l.flood_freq>=8?'#dc2626':l.flood_freq>=6?'#d97706':'#9ca3af'};"></div></div>
+                    <span style="font-size:10px;color:#aaa;">${l.flood_freq}</span>
+                </div>
+            </td>
+            <td><span class="active-dot ${l.active?'on':'off'}"></span></td>
+        </tr>`).join('')}${data.length===0?'<tr><td colspan="11" style="padding:40px;text-align:center;color:#ccc;">No LGAs match your filters</td></tr>':''}</tbody>
+    </table></div>`;
+}
+
+function renderTimeline() {
+    const data = getFiltered();
+    document.getElementById('timelineView').innerHTML = ['past','present','future'].map(phase => {
+        const items = data.filter(l => l.timeline === phase);
+        const tl = TIMELINE[phase];
+        return `<div class="timeline-section">
+            <div class="timeline-header" style="background:${tl.color}08;border-left:3px solid ${tl.color};">
+                <span class="icon"><i class="${tl.icon}" style="color:${tl.color};font-size:14px;"></i></span>
+                <div><div style="font-size:14px;font-weight:700;color:${tl.color};">${tl.label}</div><div style="font-size:11px;color:#999;">${tl.desc}</div></div>
+                <span class="count" style="background:${tl.color}12;color:${tl.color};">${items.length}</span>
+            </div>
+            ${items.length === 0 ? '<div style="font-size:12px;color:#ccc;padding:8px 16px;font-style:italic;">No LGAs match current filters</div>' :
+            `<div class="timeline-cards">${items.map(l => `<div class="timeline-card" onclick="openDrawer(${l.id})">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                    <div>
+                        <div style="font-size:13px;font-weight:700;">${l.name}</div>
+                        <div style="font-size:11px;color:#999;">${l.state} · ${l.region}</div>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${TIERS[l.tier].color}10;color:${TIERS[l.tier].color};font-weight:800;font-size:14px;">${l.score}</div>
+                </div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+                    <span class="tier-badge ${TIERS[l.tier].cls}">${TIERS[l.tier].label}</span>
+                    <span class="stage-pill stage-${l.stage}">${l.stage}</span>
+                    <span style="font-size:11px;color:#999;margin-left:auto;">$${(l.est_value/1e6).toFixed(1)}M</span>
+                </div>
+            </div>`).join('')}</div>`}
+        </div>`;
+    }).join('');
+}
+
+function renderAll() {
+    renderKPIs();
+    renderFilters();
+    renderSidebar();
+    if (currentView === 'table') renderTable();
+    else renderTimeline();
+}
+
+// ═══════════════════════════════════════
+// DETAIL DRAWER
+// ═══════════════════════════════════════
+function openDrawer(id) {
+    const l = allLGAs.find(x => x.id === id);
+    if (!l) return;
+    selectedLGA = l;
+    const breakdown = [
+        { label:'Flood frequency', val:l.flood_freq, w:30, color:'#dc2626' },
+        { label:'Infrastructure', val:l.infra, w:25, color:'#2563eb' },
+        { label:'Recovery scale', val:l.recovery, w:20, color:'#7c3aed' },
+        { label:'Competition (inv)', val:10-l.competition, w:15, color:'#059669' },
+        { label:'Accessibility', val:l.access, w:10, color:'#d97706' }
+    ];
+
+    document.getElementById('drawer').innerHTML = `
+        <div class="drawer-header">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                    <div style="font-size:18px;font-weight:700;margin-bottom:4px;">${l.name}</div>
+                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <span style="font-size:12px;font-weight:700;color:${STATES[l.state]?.color||'#555'};">${l.state}</span>
+                        <span style="font-size:12px;color:#ddd;">·</span>
+                        <span style="font-size:12px;color:#999;">${l.region}</span>
+                        <span class="tier-badge ${TIERS[l.tier].cls}">${TIERS[l.tier].label}</span>
+                        <span class="timeline-badge ${TIMELINE[l.timeline].cls}"><i class="${TIMELINE[l.timeline].icon}" style="font-size:7px;"></i> ${TIMELINE[l.timeline].label}</span>
+                    </div>
+                </div>
+                <button class="drawer-close" onclick="closeDrawer()">✕</button>
+            </div>
+        </div>
+        <div class="drawer-body">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                <div style="width:64px;height:64px;border-radius:16px;background:${TIERS[l.tier].color}08;display:flex;align-items:center;justify-content:center;border:2px solid ${TIERS[l.tier].color}22;">
+                    <span style="font-size:24px;font-weight:800;color:${TIERS[l.tier].color};">${l.score}</span>
+                </div>
+                <div>
+                    <div style="font-size:13px;font-weight:600;color:#555;">Opportunity score</div>
+                    <div style="font-size:11px;color:#aaa;">${TIERS[l.tier].desc}</div>
+                </div>
+            </div>
+            <div class="drawer-section-title">Score breakdown</div>
+            ${breakdown.map(s => `<div class="score-breakdown-row">
+                <div class="score-breakdown-label"><span>${s.label} (${s.w}%)</span><span style="font-weight:700;color:${s.color};">${s.val}/10</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><div class="score-bar-track"><div class="score-bar-fill" style="width:${s.val*10}%;background:${s.color};"></div></div></div>
+            </div>`).join('')}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0;">
+                <div class="mini-stat" style="border-left-color:${TIERS[l.tier].color};"><div class="label">Est. value</div><div class="value" style="color:${TIERS[l.tier].color};">$${(l.est_value/1e6).toFixed(1)}M</div></div>
+                <div class="mini-stat" style="border-left-color:#3b82f6;"><div class="label">Stage</div><div class="value" style="color:#3b82f6;">${l.stage}</div></div>
+                <div class="mini-stat" style="border-left-color:#6366f1;"><div class="label">Last event</div><div class="value" style="color:#6366f1;">${l.last_event}</div></div>
+                <div class="mini-stat" style="border-left-color:${l.active?'#059669':'#9ca3af'};"><div class="label">Status</div><div class="value" style="color:${l.active?'#059669':'#9ca3af'};">${l.active?'Active':'Inactive'}</div></div>
+            </div>
+            <div class="drawer-section-title">DRFA categories</div>
+            <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+                ${CATEGORIES.map(c => `<span class="cat-badge ${l.cats.includes(c)?'cat-active':'cat-inactive'}">Cat ${c}</span>`).join('')}
+            </div>
+            <div class="drawer-section-title">Likely work types</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;">
+                ${l.works.map(w => `<span class="work-chip">${w}</span>`).join('')}
+            </div>
+            <div class="drawer-section-title">Notes</div>
+            <div style="font-size:13px;color:#666;line-height:1.6;padding:12px;background:rgba(0,0,0,0.02);border-radius:8px;">
+                ${l.notes}
+            </div>
+            <div class="drawer-section-title" style="margin-top:20px;">AUS BD & CRM link</div>
+            <div style="font-size:12px;color:#999;padding:10px;background:rgba(0,0,0,0.02);border-radius:8px;">
+                Region ID: <code style="background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:4px;font-size:11px;">${l.regionId || 'N/A'}</code>
+                <br>State: ${l.state} · Zone: ${l.zone}
+                <br><a href="index.html" style="color:#4f46e5;font-weight:600;text-decoration:none;margin-top:6px;display:inline-block;">Open in AUS BD & CRM →</a>
+            </div>
+        </div>
+    `;
+    document.getElementById('drawer').style.display = 'block';
+    document.getElementById('drawerOverlay').style.display = 'block';
+}
+
+function closeDrawer() {
+    document.getElementById('drawer').style.display = 'none';
+    document.getElementById('drawerOverlay').style.display = 'none';
+    selectedLGA = null;
+}
+
+// ═══════════════════════════════════════
+// STATE SWITCHING
+// ═══════════════════════════════════════
+function switchDRFAState(code) {
+    currentDRFAState = code;
+    filters.region = 'all'; // reset region filter on state change
+    renderStateTabs();
+    renderAll();
+}
+
+function switchView(v) {
+    currentView = v;
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+    document.getElementById('tableView').style.display = v==='table' ? 'block' : 'none';
+    document.getElementById('timelineView').style.display = v==='timeline' ? 'block' : 'none';
+    if (v === 'table') renderTable();
+    else renderTimeline();
+}
+
+// ═══════════════════════════════════════
+// AI SEARCH (placeholder — wire to your API)
+// ═══════════════════════════════════════
+function triggerAISearch() {
+    const btn = document.getElementById('aiSearchBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching DRFA feeds...';
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-bolt"></i> AI search for new DRFA events';
+        // In production: fetch from NEMA/data.gov.au, parse new AGRNs, update allLGAs, re-render
+        alert('AI Search: In production, this would poll NEMA/QRA/NSW-RA feeds for new DRFA activations and auto-update the scoring engine. Wire this to your backend API.');
+    }, 2500);
+}
+
+// ═══════════════════════════════════════
+// URL PARAMS (deep link from AUS BD & CRM)
+// ═══════════════════════════════════════
+function applyURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('state') && STATES[params.get('state')]) {
+        currentDRFAState = params.get('state');
+    }
+    if (params.get('region')) {
+        filters.region = params.get('region');
+    }
+    if (params.get('lga')) {
+        const id = +params.get('lga');
+        if (allLGAs.find(l => l.id === id)) {
+            setTimeout(() => openDrawer(id), 300);
+        }
+    }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+applyURLParams();
+renderStateTabs();
+renderAll();
+</script>
+</body>
+</html>
